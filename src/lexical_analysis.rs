@@ -1,4 +1,5 @@
 use lib;
+
 pub fn string_space_remover(query: String) ->String{
     let mut i: usize = 0;
     let mut j: usize;

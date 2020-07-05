@@ -1,5 +1,8 @@
-use std::fs;
 use standard_function_declarations;
+use std::io;
+use std::fs;
+use std::io::Write;
+use std::io::Read;
 
 pub enum Error{
     BOB_NOT_FOUND,
@@ -19,10 +22,45 @@ pub fn raise(err: Error){
        }
 }
 
-pub fn iterator(query_vector: &mut Vec<String>,translated_file: &fs::File,headers: &mut Headers){
+pub fn iterator(query_vector: &mut Vec<String>,translated_file: &mut fs::File,headers: &mut Headers){
     match query_vector[0].as_str(){
-        "write" => standard_function_declarations::write(&translated_file, query_vector[1], &mut headers),
+        "write" => standard_function_declarations::write(translated_file, &query_vector[1],headers),
         _ => raise(Error::VERB_EXPECTED),
     }
 
+}
+
+fn text_prepender_and_curly_appender(data: String){
+    let mut temp_file = fs::OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .open("swapper.cpp")
+        .expect("Unable to create a temporary resource");   
+   let mut translated_file = fs::OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(false)
+        .open("output.cpp")
+        .expect("Unable to create a temporary resource");   
+
+    temp_file.write_all(data.as_bytes());
+    let mut buffer = [0u8; 4096];
+    loop {
+      let nbytes = translated_file.read(&mut buffer).expect("Unable to read from file");
+      temp_file.write_all(&buffer[..nbytes]).expect("Unable to write buffer");
+      if nbytes < buffer.len() { break; }
+   }
+    temp_file.write_all("}".as_bytes());
+    fs::remove_file("output.cpp");
+    fs::rename("swapper.cpp","output.cpp");
+}
+
+pub fn header_and_token_includer(headers: Headers){
+    let mut data: String = String::from("//This is a temp\n");
+    if headers.iostream == true{
+        data += "#include<iostream>\n"
+    }
+    data += "int main(){\n";
+    text_prepender_and_curly_appender(data);
 }
