@@ -3,7 +3,7 @@ Bob's a new language (Generates C++ code and then compiles it with g++). Say hel
 
 # Dependencies
 1. Install rust - https://www.rust-lang.org/tools/install.
-2. Install g++ - apt install g++
+2. Install g++ - apt install g++ (for Ubuntu based Linux dostros)
 
 # Run
 cargo run main.bob (assuming main.bob is in the current directory)
