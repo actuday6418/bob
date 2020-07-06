@@ -1,5 +1,3 @@
-use crate::lib;
-
 ///-----------------Everything that has to do with verifying and processing syntax goes here-----
 
 pub fn string_space_remover(query: String) ->String{
@@ -73,14 +71,14 @@ pub fn bob_and_punctuation_remover(query: String) -> String{
         temp = query[4..].to_string();
     }
     else{
-        lib::raise(lib::Error::BOB_NOT_FOUND);
+        crate::raise(crate::Error::BOB_NOT_FOUND);
     }
     if &query[query.len() - 1 ..] == "."{
         temp = temp[..temp.len() - 1].to_string();
     }
     else{
         println!("{}",&query[query.len() - 1 ..]);
-        lib::raise(lib::Error::PERIOD_NOT_FOUND);
+        crate::raise(crate::Error::PERIOD_NOT_FOUND);
     }
     temp
 }

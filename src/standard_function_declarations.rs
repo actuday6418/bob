@@ -1,6 +1,5 @@
 use std::fs;
 use std::io::Write;
-use crate::lib;
 
 ///-----------------HOW TO CREATE A NEW FUNCTION-------------
 /// 1. Take possession of the keyword you want to use by adding to the match expression under
@@ -19,7 +18,7 @@ use crate::lib;
 /// 5. DOCUMENT your function, and you're done!
 ///---------------------------------------------------------
 
-pub fn write(translated_file: &mut fs::File,argument: &str, headers: &mut lib::Headers){
+pub fn write(translated_file: &mut fs::File,argument: &str, headers: &mut crate::Headers){
     
     ///-----------WHASSDIS-------------
     /// Accepts a string or expression that is evaluated and written to stdout.
@@ -37,7 +36,7 @@ pub fn write(translated_file: &mut fs::File,argument: &str, headers: &mut lib::H
     (*translated_file).write_all(";\n".as_bytes());
 }
 
-pub fn read(translated_file: &mut fs::File,var_name: String, headers: &mut lib::Headers){
+pub fn read(translated_file: &mut fs::File,var_name: String, headers: &mut crate::Headers){
 
     ///--------WHASSDIS--------
     /// Accepts a string (variable name) to which data is read from stdin.

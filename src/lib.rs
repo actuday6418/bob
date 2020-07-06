@@ -1,4 +1,5 @@
-use crate::standard_function_declarations;
+pub mod standard_function_declarations;
+pub mod lexical_analysis;
 use std::io;
 use std::fs;
 use std::io::Write;
