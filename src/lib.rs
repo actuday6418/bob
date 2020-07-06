@@ -1,4 +1,4 @@
-use standard_function_declarations;
+use crate::standard_function_declarations;
 use std::io;
 use std::fs;
 use std::io::Write;

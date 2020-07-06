@@ -1,4 +1,6 @@
-use lib;
+use crate::lib;
+
+///-----------------Everything that has to do with verifying and processing syntax goes here-----
 
 pub fn string_space_remover(query: String) ->String{
     let mut i: usize = 0;
