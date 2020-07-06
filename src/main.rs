@@ -23,18 +23,19 @@ fn main() {
     let arg: Vec<String> = env::args().collect();
     let query: String = fs::read_to_string(&arg[1])
         .expect("Bob can't see that file!");
-    let mut query = &(query.trim());
-    let mut query: String = lexical_analysis::comment_remover(query);
-    let mut query: String = lexical_analysis::string_space_remover(query);
-    let mut query: String = lexical_analysis::bob_and_punctuation_remover(query);
+    let query = &(query.trim());
+    let query: String = lexical_analysis::comment_remover(query);
+    let query: String = lexical_analysis::string_space_remover(query);
+    let query: String = lexical_analysis::bob_and_punctuation_remover(query);
     let mut query_vector: Vec<String> = query.split_whitespace().map(String::from).collect();
-    bob::iterator(&mut query_vector,&mut translated_file, &mut headers);
+    let mut variable_stack: Vec<bob::Variable> = Vec::new();
+    bob::iterator(&mut query_vector,&mut translated_file, &mut headers,&mut variable_stack);
     bob::header_and_token_includer(headers);
     process::Command::new("g++")
         .arg("output.cpp")
         .arg("-o")
         .arg("app")
         .status()
-        .expect("Couldn't run g++");
-    fs::remove_file("output.cpp");
+        .expect("Couldn't run g++. Where's g++?");
+    fs::remove_file("output.cpp").expect("Bob couldn't delete his temporary file");
 }

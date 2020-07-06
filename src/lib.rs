@@ -1,6 +1,6 @@
+#![allow(non_camel_case_types)]
 pub mod standard_function_declarations;
 pub mod lexical_analysis;
-use std::io;
 use std::fs;
 use std::io::Write;
 use std::io::Read;
@@ -9,23 +9,45 @@ pub enum Error{
     BOB_NOT_FOUND,
     PERIOD_NOT_FOUND,
     VERB_EXPECTED,
+    IDENTITY_EXISTS,
 }
 
 pub struct Headers{
     pub iostream: bool,
 }
 
+pub enum Variable_type{
+    NUMBER,
+    DECIMAL,
+    STRING,
+}
+
+pub struct Variable{
+   pub variable_type: Variable_type,
+   pub variable_name: String,
+}
+
+impl PartialEq for Variable{
+        fn eq(&self, other: &Variable) -> bool {
+        self.variable_name == other.variable_name
+    }
+}
+impl Eq for Variable{}
+
 pub fn raise(err: Error){
     match err {
        Error::BOB_NOT_FOUND => println!("Call Bob by name!"),
        Error::PERIOD_NOT_FOUND => println!("Periods go at the end of each sentence!"),
        Error::VERB_EXPECTED => println!("A verb is an action word. A function. A verb is what Bob needs to be told!"),
+       Error::IDENTITY_EXISTS => println!("The identity you're trying to declare already exists!"),
        }
 }
 
-pub fn iterator(query_vector: &mut Vec<String>,translated_file: &mut fs::File,headers: &mut Headers){
+pub fn iterator(query_vector: &mut Vec<String>,translated_file: &mut fs::File,headers: &mut Headers,variable_stack: &mut Vec<Variable>){
     match query_vector[0].as_str(){
-        "write" => standard_function_declarations::write(translated_file, &query_vector[1],headers),
+        "write" => standard_function_declarations::write_to_stdout(translated_file,&query_vector[1],headers),
+        "read" => standard_function_declarations::read_from_stdin(translated_file,&query_vector[1],headers,variable_stack),
+        "let" => standard_function_declarations::variable_assigner(translated_file,&query_vector[1],&query_vector[4],variable_stack),
         _ => raise(Error::VERB_EXPECTED),
     }
 

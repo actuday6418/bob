@@ -1,6 +1,6 @@
 ///-----------------Everything that has to do with verifying and processing syntax goes here-----
 
-pub fn string_space_remover(query: String) ->String{
+pub fn string_space_remover(query: String) -> String{
     let mut i: usize = 0;
     let mut j: usize;
     let mut flag: bool;
@@ -60,7 +60,7 @@ pub fn comment_remover(query: &str) -> String{
     }
     let mut query = String::from(query);
     for x in comment_vec{
-    query.replace_range((x.0 .. (x.1+1)),"");
+    query.replace_range(x.0 .. x.1 + 1,"");
     }
     query
 }
