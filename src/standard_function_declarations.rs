@@ -43,7 +43,7 @@ pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,hea
 
     //!--------WHASSDIS--------
     //! Accepts a string (variable name), checks if it's included in the variable stack. If it is, data is read from stdin to it.
-
+    if variable_stack.iter().any(|i| i.variable_name == variable_name.as_str()){
     if headers.iostream == false{
         headers.iostream = true;
     }
@@ -53,6 +53,7 @@ pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,hea
         .expect("Write to output.cpp failed!");
     (*translated_file).write_all(";\n".as_bytes())
         .expect("Write to output.cpp failed!");
+    }
 }
 
 pub fn variable_assigner(translated_file: &mut fs::File,variable_name: &String,variable_type: &String,variable_stack: &mut Vec<crate::Variable>){

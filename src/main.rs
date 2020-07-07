@@ -23,30 +23,21 @@ fn main() {
     let mut headers: bob::Headers = bob::Headers{iostream: false};
     let arg: Vec<String> = env::args().collect();
     // uses a reader buffer
-    let file = fs::File::open(&arg[1]).expect("Couldn't open that file");
-    let mut reader = io::BufReader::new(file);
+    let reader = fs::File::open(&arg[1]).expect("Couldn't open that file");
+    let reader = io::BufReader::new(reader);
     let mut query = String::new();
-    loop {
-        match reader.read_line(&mut query) {
-            Ok(bytes_read) => {
-                if bytes_read == 0 {
-                    break;
-                }
-                let query = &(query.trim());
-                let query: String = lexical_analysis::comment_remover(query);
-                let query: String = lexical_analysis::string_space_remover(query);
-                let mut query: String = lexical_analysis::bob_and_punctuation_remover(query);
-                println!("{}", query);
-                let mut query_vector: Vec<String> = query.split_whitespace().map(String::from).collect();
-                let mut variable_stack: Vec<bob::Variable> = Vec::new();
-                bob::iterator(&mut query_vector,&mut translated_file, &mut headers,&mut variable_stack);
-                query.clear();
-            }
-            Err(err) => {
-                return ();
-            }
-        };
-    }
+    for query in reader.lines() { // !! Is this the most efficient way to iterate through each line in the source? !!
+            let query = query.unwrap();
+            let query = &(query.trim());
+            let query: String = lexical_analysis::comment_remover(query);
+            let query: String = lexical_analysis::string_space_remover(query);
+            let mut query: String = lexical_analysis::bob_and_punctuation_remover(query);
+            let mut query_vector: Vec<String> = query.split_whitespace().map(String::from).collect();
+            let mut variable_stack: Vec<bob::Variable> = Vec::new();
+            bob::iterator(&mut query_vector,&mut translated_file, &mut headers,&mut variable_stack);
+            query.clear();
+            query_vector.clear();   
+        }
 
     bob::header_and_token_includer(headers);
     process::Command::new("g++")
@@ -55,5 +46,5 @@ fn main() {
         .arg("app")
         .status()
         .expect("Couldn't run g++. Where's g++?");
-    //fs::remove_file("output.cpp").expect("Bob couldn't delete his temporary file");
+    fs::remove_file("output.cpp").expect("Bob couldn't delete his temporary file");
 }
