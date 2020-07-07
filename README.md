@@ -7,7 +7,8 @@ Bob's a new language (Generates C++ code and then compiles it with g++). Say hel
 
 # Run
 1. cargo run main.bob (assuming main.bob is in the current directory)
-2. Access docs through cargo doc --open
+2. Use ./app for running the compiled app.
+3. Access docs through cargo doc --open
 
 # Overview of the syntax
 1. Bob statements are called sentences.
