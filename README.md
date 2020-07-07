@@ -6,7 +6,8 @@ Bob's a new language (Generates C++ code and then compiles it with g++). Say hel
 2. Install g++ - apt install g++ (for Ubuntu based Linux distros)
 
 # Run
-cargo run main.bob (assuming main.bob is in the current directory)
+1. cargo run main.bob (assuming main.bob is in the current directory)
+2. Access docs through cargo doc --open
 
 # Overview of the syntax
 1. Bob statements are called sentences.
