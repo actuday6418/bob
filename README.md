@@ -11,6 +11,9 @@ cargo run main.bob (assuming main.bob is in the current directory)
 # Hello World in Bob
 Bob write "hello world".
 
+#Declare a variable
+Bob let Martha be a number
+
 # Comments in Bob
 Go between brackets
 
