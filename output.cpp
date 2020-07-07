@@ -1,4 +1,6 @@
 //This is a temp
+#include<iostream>
 int main(){
-int Martha;
+std::cout<<"Declaring Martha....";
+std::cout<<"Declaring Martha....".;
 }
