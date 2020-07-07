@@ -1,1 +1,1 @@
-initSidebarItems({});
+initSidebarItems({"enum":[["Error",""],["Variable_type",""]],"fn":[["header_and_token_includer",""],["iterator",""],["raise",""]],"mod":[["lexical_analysis",""],["standard_function_declarations",""]],"struct":[["Headers",""],["Variable",""]]});
