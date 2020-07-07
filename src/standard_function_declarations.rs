@@ -20,8 +20,8 @@ use std::io::Write;
 
 pub fn write_to_stdout(translated_file: &mut fs::File,argument: &str, headers: &mut crate::Headers){
     
-    ///-----------WHASSDIS-------------
-    /// Accepts a string or expression that is evaluated and written to stdout.
+    //!-----------WHASSDIS-------------
+    //! Accepts a string or expression that is evaluated and written to stdout.
 
     let mut final_string: String = String::new();
     if headers.iostream == false{
@@ -41,8 +41,8 @@ pub fn write_to_stdout(translated_file: &mut fs::File,argument: &str, headers: &
 
 pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,headers: &mut crate::Headers,variable_stack: & Vec<crate::Variable>){
 
-    ///--------WHASSDIS--------
-    /// Accepts a string (variable name), checks if it's included in the variable stack. If it is, data is read from stdin to it.
+    //!--------WHASSDIS--------
+    //! Accepts a string (variable name), checks if it's included in the variable stack. If it is, data is read from stdin to it.
 
     if headers.iostream == false{
         headers.iostream = true;
@@ -57,21 +57,24 @@ pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,hea
 
 pub fn variable_assigner(translated_file: &mut fs::File,variable_name: &String,variable_type: &String,variable_stack: &mut Vec<crate::Variable>){
 
-    ///--------WHASSDIS--------
-    /// Checks if the variable name is part of the variable stack, and if it isn't, adds it to it and
-    /// declares the variable in C++.
+    //!--------WHASSDIS--------
+    //! Checks if the variable name is part of the variable stack, and if it isn't, adds it to it and
+    //! declares the variable in C++.
     let variable_type = match variable_type.as_str(){
         "number" => crate::Variable_type::NUMBER,
         "decimal" => crate::Variable_type::DECIMAL,
         "string" => crate::Variable_type::STRING,
+        _ => {
+            crate::raise(crate::Error::IDENTITY_TYPE_EXPECTED);
+            crate::Variable_type::NUMBER // !! This is temporary !!
+        }
     };
-    let variable: crate::Variable = crate::Variable{ variable_type: variable_type, variable_name: *variable_name };
-    if variable_stack.iter().any(|&i| i == variable){
+    let variable: crate::Variable = crate::Variable{ variable_type: variable_type, variable_name: variable_name.clone().to_string() };
+    if variable_stack.iter().any(|i| *i == variable){
         crate::raise(crate::Error::IDENTITY_EXISTS);
     }
     else{
-        variable_stack.push(variable);
-        match variable_type{
+        match variable.variable_type{
             crate::Variable_type::NUMBER => (*translated_file).write_all("int ".as_bytes())
                                            .expect("Write to output.cpp failed!"),
             crate::Variable_type::DECIMAL => (*translated_file).write_all("float ".as_bytes())
@@ -79,10 +82,11 @@ pub fn variable_assigner(translated_file: &mut fs::File,variable_name: &String,v
             crate::Variable_type::STRING => (*translated_file).write_all("std::string ".as_bytes())
                                            .expect("Write to output.cpp failed!"),
         }
-        (*translated_file).write_all(variable_name.as_bytes())
+        (*translated_file).write_all(variable.variable_name.as_bytes())
           .expect("Write to output.cpp failed!");
         (*translated_file).write_all(";\n".as_bytes())
           .expect("Write to output.cpp failed!");
+        variable_stack.push(variable);
     }
 }
 
