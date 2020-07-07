@@ -20,12 +20,13 @@ fn main() {
         .append(true)
         .open("output.cpp")
         .expect("File creation failed");
-    let mut headers: bob::Headers = bob::Headers{iostream: false};
+    let mut headers: bob::Headers = bob::Headers{iostream: false,limits: false};
     let arg: Vec<String> = env::args().collect();
     // uses a reader buffer
     let reader = fs::File::open(&arg[1]).expect("Couldn't open that file");
     let reader = io::BufReader::new(reader);
     let mut query = String::new();
+    let mut variable_stack: Vec<bob::Variable> = Vec::new();
     for query in reader.lines() { // !! Is this the most efficient way to iterate through each line in the source? !!
             let query = query.unwrap();
             let query = &(query.trim());
@@ -33,12 +34,9 @@ fn main() {
             let query: String = lexical_analysis::string_space_remover(query);
             let mut query: String = lexical_analysis::bob_and_punctuation_remover(query);
             let mut query_vector: Vec<String> = query.split_whitespace().map(String::from).collect();
-            let mut variable_stack: Vec<bob::Variable> = Vec::new();
             bob::iterator(&mut query_vector,&mut translated_file, &mut headers,&mut variable_stack);
             query.clear();
-            query_vector.clear();   
         }
-
     bob::header_and_token_includer(headers);
     process::Command::new("g++")
         .arg("output.cpp")
@@ -46,5 +44,5 @@ fn main() {
         .arg("app")
         .status()
         .expect("Couldn't run g++. Where's g++?");
-    fs::remove_file("output.cpp").expect("Bob couldn't delete his temporary file");
+//   fs::remove_file("output.cpp").expect("Bob couldn't delete his temporary file");
 }

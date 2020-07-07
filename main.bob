@@ -1,2 +1,3 @@
-Bob write "Starting your program..".
+Bob write "Begining program..\n".
 Bob let Martha be a number.
+Bob read Martha.

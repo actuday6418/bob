@@ -43,16 +43,20 @@ pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,hea
 
     //!--------WHASSDIS--------
     //! Accepts a string (variable name), checks if it's included in the variable stack. If it is, data is read from stdin to it.
+    
     if variable_stack.iter().any(|i| i.variable_name == variable_name.as_str()){
-    if headers.iostream == false{
-        headers.iostream = true;
-    }
-    (*translated_file).write_all("std::cin>>".as_bytes())
-        .expect("Write to output.cpp failed!");
-    (*translated_file).write_all(variable_name.as_bytes())
-        .expect("Write to output.cpp failed!");
-    (*translated_file).write_all(";\n".as_bytes())
-        .expect("Write to output.cpp failed!");
+        if headers.iostream == false{
+            headers.iostream = true;
+        }
+        if headers.limits == false{
+            headers.limits = true;
+        }
+        (*translated_file).write_all("while(true){std::cin>>".as_bytes())
+            .expect("Write to output.cpp failed!");
+        (*translated_file).write_all(variable_name.as_bytes())
+            .expect("Write to output.cpp failed!");
+        (*translated_file).write_all((";\nif(std::cin.fail()){\nstd::cin.clear();\nstd::cin.ignore(std::numeric_limits<std::streamsize>::max(),".to_owned() + r" '\n');" + "\nstd::cout<<\"Input a number\"<<std::endl;\n}\nelse\nbreak;\n}\n").as_bytes())
+            .expect("Write to output.cpp failed!");
     }
 }
 
@@ -61,13 +65,14 @@ pub fn variable_assigner(translated_file: &mut fs::File,variable_name: &String,v
     //!--------WHASSDIS--------
     //! Checks if the variable name is part of the variable stack, and if it isn't, adds it to it and
     //! declares the variable in C++.
+    
     let variable_type = match variable_type.as_str(){
         "number" => crate::Variable_type::NUMBER,
         "decimal" => crate::Variable_type::DECIMAL,
         "string" => crate::Variable_type::STRING,
         _ => {
             crate::raise(crate::Error::IDENTITY_TYPE_EXPECTED);
-            crate::Variable_type::NUMBER // !! This is temporary !!
+            crate::Variable_type::NUMBER // !! This is temporary. Raise an error here and stop execution !!
         }
     };
     let variable: crate::Variable = crate::Variable{ variable_type: variable_type, variable_name: variable_name.clone().to_string() };

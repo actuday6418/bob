@@ -15,6 +15,7 @@ pub enum Error{
 
 pub struct Headers{
     pub iostream: bool,
+    pub limits: bool,
 }
 
 pub enum Variable_type{
@@ -85,6 +86,9 @@ pub fn header_and_token_includer(headers: Headers){
     let mut data: String = String::from("//This is a temp\n");
     if headers.iostream == true{
         data += "#include<iostream>\n"
+    }
+    if headers.limits == true{
+        data += "#include<limits>\n"
     }
     data += "int main(){\n";
     text_prepender_and_curly_appender(data);
