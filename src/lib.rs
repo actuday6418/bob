@@ -49,19 +49,20 @@ pub struct Token{
 impl PartialEq for Variable{
         fn eq(&self, other: &Variable) -> bool {
         *self.variable_name == *other.variable_name
-    }blender build nioh 2
+    }
 }
 
 impl Eq for Variable{}
 
-pub fn raise(err: Error){ // !! Raise has to stop execution and delete the output.cpp file in use. Also, println! isn't the most appropriate? !!
+pub fn raise(err: Error){ 
+    fs::remove_file("output.cpp").expect("Bob didn't see output.cpp");
     match err {
-       Error::BOB_NOT_FOUND => println!("Call Bob by name!"),
-       Error::PERIOD_NOT_FOUND => println!("Periods go at the end of each sentence!"),
-       Error::VERB_EXPECTED => println!("A verb is an action word. A function. A verb is what Bob needs to be told!"),
-       Error::IDENTITY_TYPE_EXPECTED => println!("Expected a variable type!"),
-       Error::IDENTITY_EXISTS => println!("The identity you're trying to declare already exists!"),
-       Error::IDENTITY_EXPECTED => println!("Name an identity!"),
+       Error::BOB_NOT_FOUND => panic!("Call Bob by name!"),
+       Error::PERIOD_NOT_FOUND => panic!("Periods go at the end of each sentence!"),
+       Error::VERB_EXPECTED => panic!("A verb is an action word. A function. A verb is what Bob needs to be told!"),
+       Error::IDENTITY_TYPE_EXPECTED => panic!("Expected a variable type!"),
+       Error::IDENTITY_EXISTS => panic!("The identity you're trying to declare already exists!"),
+       Error::IDENTITY_EXPECTED => panic!("Name an identity!"),
        }
 }
 

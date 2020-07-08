@@ -47,7 +47,7 @@ pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,hea
     //!--------WHASSDIS--------
     //! Accepts a string (variable name), checks if it's included in the variable stack. If it is, data is read from stdin to it.
     
-    let mut variable_type: crate::Variable_type;
+    let mut variable_type: crate::Variable_type = crate::Variable_type::NUMBER;
     if variable_stack.iter().any(|i| {
             if i.variable_name == variable_name.as_str() {
                 variable_type = i.variable_type.clone();
