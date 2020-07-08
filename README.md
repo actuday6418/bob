@@ -1,6 +1,9 @@
 # Bob
 Bob's a new language (Generates C++ code and then compiles it with g++). Say hello to Bob.
 
+# Hello World
+Bob write "Hello world!!"
+
 # Dependencies
 1. Install rust - https://www.rust-lang.org/tools/install.
 2. Install g++ - apt install g++ (for Ubuntu based Linux distros)
@@ -21,4 +24,9 @@ Check out the file main.bob in the root of this repository.
 5. A verb HAS to follow the Bob call, as it is put.
 6. Sentences may contain expressions, which are evaluated into arguments for each verb.
 7. Comments in Bob go in between brackets.
-8. Example - Bob write "hello world" (comments go here). 
+
+# Implemented Verbs
+1. write - writes to stdout.
+2. read - reads from stdin.
+3. let - declares a variable.
+
