@@ -11,6 +11,7 @@ pub enum Error{
     VERB_EXPECTED,
     IDENTITY_TYPE_EXPECTED,
     IDENTITY_EXISTS,
+    IDENTITY_EXPECTED,
 }
 
 pub struct Headers{
@@ -18,10 +19,21 @@ pub struct Headers{
     pub limits: bool,
 }
 
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub enum Variable_type{
     NUMBER,
     DECIMAL,
     STRING,
+}
+
+pub enum Token_type{
+    BOB_CALL,
+    PERIOD,
+    VERB,
+    IDENTITY,
+    STRING_LITERAL,
+    DECIMAL_LITERAL,
+    NUMBER_LITERAL,
 }
 
 pub struct Variable{
@@ -29,20 +41,27 @@ pub struct Variable{
    pub variable_name: String,
 }
 
+pub struct Token{
+    pub token_name: String,
+    pub token_type: Token_type,
+}
+
 impl PartialEq for Variable{
         fn eq(&self, other: &Variable) -> bool {
         *self.variable_name == *other.variable_name
-    }
+    }blender build nioh 2
 }
+
 impl Eq for Variable{}
 
-pub fn raise(err: Error){
+pub fn raise(err: Error){ // !! Raise has to stop execution and delete the output.cpp file in use. Also, println! isn't the most appropriate? !!
     match err {
        Error::BOB_NOT_FOUND => println!("Call Bob by name!"),
        Error::PERIOD_NOT_FOUND => println!("Periods go at the end of each sentence!"),
        Error::VERB_EXPECTED => println!("A verb is an action word. A function. A verb is what Bob needs to be told!"),
        Error::IDENTITY_TYPE_EXPECTED => println!("Expected a variable type!"),
        Error::IDENTITY_EXISTS => println!("The identity you're trying to declare already exists!"),
+       Error::IDENTITY_EXPECTED => println!("Name an identity!"),
        }
 }
 
