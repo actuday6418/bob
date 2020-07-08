@@ -10,6 +10,9 @@ Bob's a new language (Generates C++ code and then compiles it with g++). Say hel
 2. Use ./app for running the compiled app.
 3. Access docs through cargo doc --open
 
+# Example
+Check out the file main.bob in the root of this repository.
+
 # Overview of the syntax
 1. Bob statements are called sentences.
 2. Each sentence is terminated with a period.

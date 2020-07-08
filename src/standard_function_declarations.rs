@@ -18,7 +18,7 @@ use std::io::Write;
 /// 5. DOCUMENT your function, and you're done!
 ///---------------------------------------------------------
 
-pub fn write_to_stdout(translated_file: &mut fs::File,argument: &str, headers: &mut crate::Headers){
+pub fn write_to_stdout(translated_file: &mut fs::File,argument: &str, headers: &mut crate::Headers,variable_stack: & Vec<crate::Variable>){
     
     //!-----------WHASSDIS-------------
     //! Accepts a string or expression that is evaluated and written to stdout.
@@ -26,6 +26,9 @@ pub fn write_to_stdout(translated_file: &mut fs::File,argument: &str, headers: &
     let mut final_string: String = String::new();
     if headers.iostream == false{
         headers.iostream = true;
+    }
+    if variable_stack.iter().any(|i| i.variable_name == argument.to_string()){
+        final_string = String::from(argument);
     }
     (*translated_file).write_all("std::cout<<".as_bytes())
         .expect("Write to output.cpp failed!");
@@ -44,7 +47,7 @@ pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,hea
     //!--------WHASSDIS--------
     //! Accepts a string (variable name), checks if it's included in the variable stack. If it is, data is read from stdin to it.
     
-    if variable_stack.iter().any(|i| i.variable_name == variable_name.as_str()){
+    if variable_stack.iter().any(|i| i.variable_name == variable_name.as_str()){ // !! Pass the data type also and display relevant error message !!
         if headers.iostream == false{
             headers.iostream = true;
         }

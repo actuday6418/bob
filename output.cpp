@@ -13,4 +13,5 @@ std::cout<<"Input a number"<<std::endl;
 else
 break;
 }
+std::cout<<Martha;
 }

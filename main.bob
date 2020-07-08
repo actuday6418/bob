@@ -1,3 +1,4 @@
 Bob write "Begining program..\n".
 Bob let Martha be a number.
 Bob read Martha.
+Bob write Martha.
