@@ -27,7 +27,7 @@ Check out the file main.bob in the root of this repository.
 
 # Implemented Verbs
 1. write - writes to stdout.
-2. write - writes to stdout after appending a newline to argument string.
+2. write_line - writes to stdout after appending a newline to argument string.
 3. read - reads from stdin.
 4. let - declares a variable.
 
