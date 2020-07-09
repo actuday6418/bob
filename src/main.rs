@@ -25,7 +25,6 @@ fn main() {
     // uses a reader buffer
     let reader = fs::File::open(&arg[1]).expect("Couldn't open that file");
     let reader = io::BufReader::new(reader);
-    let mut query = String::new();
     let mut variable_stack: Vec<bob::Variable> = Vec::new();
     for query in reader.lines() { // !! Is this the most efficient way to iterate through each line in the source? !!
             let query = query.unwrap();
@@ -44,5 +43,5 @@ fn main() {
         .arg("app")
         .status()
         .expect("Couldn't run g++. Where's g++?");
-//   fs::remove_file("output.cpp").expect("Bob couldn't delete his temporary file");
+   fs::remove_file("output.cpp").expect("Bob couldn't delete his temporary file");
 }

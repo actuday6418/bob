@@ -6,7 +6,9 @@ use std::io::Write;
 ///    the iterator function in lib.rs.
 ///
 /// 2. Define your function in this file, with the file handle to output.cpp as an
-///    argument(translated_file).
+///    argument(translated_file). The argument names here and function(verb) name, both in Bob and here, must be in snake case. You may use the same 
+///    function definition for similar Bob verbs. For example both write_line and write Bob
+///    functions are defined in write_to_stdout, differentiated only by a boolean argument(new_line).
 /// 
 /// 3. Add whatever header your C++ code depends on to the Headers struct in lib.rs. Initialize the header name to false when the enum Headers is
 ///    instantiated in main.rs.
@@ -18,10 +20,11 @@ use std::io::Write;
 /// 5. DOCUMENT your function, and you're done!
 ///---------------------------------------------------------
 
-pub fn write_to_stdout(translated_file: &mut fs::File,argument: &str, headers: &mut crate::Headers,variable_stack: & Vec<crate::Variable>){
+pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument: &str, headers: &mut crate::Headers,variable_stack: & Vec<crate::Variable>){
     
     //!-----------WHASSDIS-------------
-    //! Accepts a string or expression that is evaluated and written to stdout.
+    //! Accepts a string or expression that is evaluated and written to stdout. Defines both the
+    //! write and write_line Bob functions.
 
     let mut final_string: String = String::new();
     if headers.iostream == false{
@@ -34,12 +37,16 @@ pub fn write_to_stdout(translated_file: &mut fs::File,argument: &str, headers: &
         .expect("Write to output.cpp failed!");
     if argument.as_bytes()[0] as char== '"'{
         let mut temp = String::from(argument.replace("_"," "));
+        if new_line {
+            temp = temp[ .. temp.len() - 1].to_string() + r"\n" + "\"";
+        }
         final_string = temp;
     }
     (*translated_file).write_all(final_string.as_bytes())
         .expect("Write to output.cpp failed!");
     (*translated_file).write_all(";\n".as_bytes())
         .expect("Write to output.cpp failed!");
+    
 }
 
 pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,headers: &mut crate::Headers,variable_stack: & Vec<crate::Variable>){
@@ -69,7 +76,11 @@ pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,hea
         (*translated_file).write_all(variable_name.as_bytes())
             .expect("Write to output.cpp failed!");
         if variable_type == crate::Variable_type::NUMBER{
-            (*translated_file).write_all((";\nif(std::cin.fail()){\nstd::cin.clear();\nstd::cin.ignore(std::numeric_limits<std::streamsize>::max(),".to_owned() + r" '\n');" + "\nstd::cout<<\"Input a number\"<<std::endl;\n}\nelse\nbreak;\n}\n").as_bytes())
+            (*translated_file).write_all((";\nif(std::cin.fail()){\nstd::cin.clear();\nstd::cin.ignore(std::numeric_limits<std::streamsize>::max(),".to_owned() + r" '\n');" + "\nstd::cout<<\"Tell Bob a number\"<<std::endl;\n}\nelse\nbreak;\n}\n").as_bytes())
+                .expect("Write to output.cpp failed!");
+        }
+        else if variable_type == crate::Variable_type::DECIMAL{
+            (*translated_file).write_all((";\nif(std::cin.fail()){\nstd::cin.clear();\nstd::cin.ignore(std::numeric_limits<std::streamsize>::max(),".to_owned() + r" '\n');" + "\nstd::cout<<\"Tell Bob a decimal number!\"<<std::endl;\n}\nelse\nbreak;\n}\n").as_bytes())
                 .expect("Write to output.cpp failed!");
         }
     }

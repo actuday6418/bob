@@ -22,11 +22,12 @@ Check out the file main.bob in the root of this repository.
 3. Each sentence begins with calling Bob.
 4. Function names in Bob are called verbs.
 5. A verb HAS to follow the Bob call, as it is put.
-6. Sentences may contain expressions, which are evaluated into arguments for each verb.
+6. Sentences may contain expressions (under development), which are evaluated into arguments for each verb.
 7. Comments in Bob go in between brackets.
 
 # Implemented Verbs
 1. write - writes to stdout.
-2. read - reads from stdin.
-3. let - declares a variable.
+2. write - writes to stdout after appending a newline to argument string.
+3. read - reads from stdin.
+4. let - declares a variable.
 
