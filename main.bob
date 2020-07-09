@@ -7,7 +7,7 @@ Bob write_line "Enter the value of Peter".
 Bob read Peter.
 Bob write "Martha is ".
 Bob write Martha.
-Bob write_line "".
+Bob write_line "".(used to append a new line - for now)
 Bob write "Peter is ".
 Bob write Peter.
 Bob write_line "".
