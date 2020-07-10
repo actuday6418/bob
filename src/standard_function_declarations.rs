@@ -10,7 +10,7 @@ use std::io::Write;
 ///    function definition for similar Bob verbs. For example both write_line and write Bob
 ///    functions are defined in write_to_stdout, differentiated only by a boolean argument(new_line).
 /// 
-/// 3. Add whatever header your C++ code depends on to the Headers struct in lib.rs. Initialize the header name to false when the enum Headers is
+/// 3. Add whatever header your C++ code depends on to the Headers struct in lib.rs. Initialize the header name (bool value) to false when the enum Headers is
 ///    instantiated in main.rs.
 /// 
 /// 4. Add a conditional to include your header file to the data variable under the
@@ -34,7 +34,7 @@ pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument_ve
                 final_string += "<<std::endl";
             }
     }
-    if argument_vector.len() == 1 && argument_vector[0].as_bytes()[0] as char== '"'{
+    else if argument_vector.len() == 1 && argument_vector[0].as_bytes()[0] as char== '"'{
         let mut temp = String::from(argument_vector[0].replace("_"," "));
         if new_line {
             temp = temp[ .. temp.len() - 1].to_string() + r"\n" + "\"";
