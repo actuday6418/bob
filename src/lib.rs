@@ -67,11 +67,19 @@ pub fn raise(err: Error){
 }
 
 pub fn iterator(query_vector: &mut Vec<String>,translated_file: &mut fs::File,headers: &mut Headers,variable_stack: &mut Vec<Variable>){
+    for (position, element) in query_vector.iter().enumerate() {
+        if *element == "plus".to_string(){
+            let element = &"+".to_string();
+        }
+        if *element == "minus".to_string(){
+            let element = &"-".to_string();
+        }
+    }
     match query_vector[0].as_str(){
-        "write" => standard_function_declarations::write_to_stdout(false,translated_file,&query_vector[1],headers,variable_stack),
-        "write_line" => standard_function_declarations::write_to_stdout(true,translated_file,&query_vector[1],headers,variable_stack),
+        "write" => standard_function_declarations::write_to_stdout(false,translated_file,&query_vector[1..].to_vec(),headers,variable_stack),
+        "write_line" => standard_function_declarations::write_to_stdout(true,translated_file,&query_vector[1..].to_vec(),headers,variable_stack),
         "read" => standard_function_declarations::read_from_stdin(translated_file,&query_vector[1],headers,variable_stack),
-        "let" => standard_function_declarations::variable_assigner(translated_file,&query_vector[1],&query_vector[4],variable_stack),
+        "let" => standard_function_declarations::variable_assigner(translated_file,&query_vector[1..].to_vec(),variable_stack),
         _ => raise(Error::VERB_EXPECTED),
     }
 

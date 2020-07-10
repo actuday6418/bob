@@ -67,8 +67,12 @@ pub fn comment_remover(query: &str) -> String{
 
 pub fn bob_and_punctuation_remover(query: String) -> String{
     let mut temp: String = "".to_string();
-    if &query[0..4] == "Bob "{
-        temp = query[4..].to_string();
+    let mut number_spaces: usize = 0;
+    while query.as_bytes()[number_spaces] as char== ' '{
+        number_spaces += 1;
+    }
+    if &query[number_spaces..number_spaces + 4] == "Bob "{
+        temp = query[number_spaces + 4 .. ].to_string();
     }
     else{
         crate::raise(crate::Error::BOB_NOT_FOUND);
@@ -77,7 +81,6 @@ pub fn bob_and_punctuation_remover(query: String) -> String{
         temp = temp[..temp.len() - 1].to_string();
     }
     else{
-        println!("{}",&query[query.len() - 1 ..]);
         crate::raise(crate::Error::PERIOD_NOT_FOUND);
     }
     temp

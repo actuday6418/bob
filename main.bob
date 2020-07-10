@@ -1,13 +1,9 @@
-(This is a program that reads two decimals and prints them)Bob write_line "Begining program..".
+(This is a program that reads two decimals and prints their sum) Bob write_line "Begining program..".
 Bob let Martha be a decimal.
 Bob let Peter be a decimal.
 Bob write_line "Enter the value of Martha".
 Bob read Martha.
 Bob write_line "Enter the value of Peter".
 Bob read Peter.
-Bob write "Martha is ".
-Bob write Martha.
-Bob write_line ""(used to append a new line - for now).
-Bob write "Peter is ".
-Bob write Peter.
-Bob write_line "".
+Bob write "The sum of Martha and Peter is: ".
+Bob write_line Peter + Martha(Every token in Bob has to be seperated by a space, including ops).

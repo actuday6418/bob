@@ -32,7 +32,7 @@ fn main() {
             let query: String = lexical_analysis::comment_remover(query);
             let query: String = lexical_analysis::string_space_remover(query);
             let mut query: String = lexical_analysis::bob_and_punctuation_remover(query);
-            let mut query_vector: Vec<String> = query.split_whitespace().map(String::from).collect();
+            let mut query_vector: Vec<String> = query.split_whitespace().map(String::from).collect::<Vec<String>>();
             bob::iterator(&mut query_vector,&mut translated_file, &mut headers,&mut variable_stack);
             query.clear();
         }
@@ -43,5 +43,5 @@ fn main() {
         .arg("app")
         .status()
         .expect("Couldn't run g++. Where's g++?");
-   fs::remove_file("output.cpp").expect("Bob couldn't delete his temporary file");
+//   fs::remove_file("output.cpp").expect("Bob couldn't delete his temporary file");
 }

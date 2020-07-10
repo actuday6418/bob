@@ -20,34 +20,36 @@ use std::io::Write;
 /// 5. DOCUMENT your function, and you're done!
 ///---------------------------------------------------------
 
-pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument_vector: Vec<String>, headers: &mut crate::Headers,variable_stack: & Vec<crate::Variable>){
-    
+pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument_vector: & Vec<String>, headers: &mut crate::Headers,variable_stack: & Vec<crate::Variable>){
     //!-----------WHASSDIS-------------
     //! Accepts a string or expression that is evaluated and written to stdout. Defines both the
     //! write and write_line Bob functions. 
 
     let mut final_string: String = String::new();
-    let argument = argument_vector.join("");
-    if headers.iostream == false{
-        headers.iostream = true;
+    if argument_vector.iter()
+        .all(|i| (variable_stack.iter().any(|j| j.variable_name == *i) || vec!["+".to_string(),"-".to_string()].iter().any(|j| j == i))){
+        let argument = argument_vector.join("");
+            final_string = argument.to_string().clone();
+            if new_line{
+                final_string += "<<std::endl";
+            }
     }
-    if variable_stack.iter().any(|i| i.variable_name == argument.to_string()){
-        final_string = String::from(argument);
-    }
-    (*translated_file).write_all("std::cout<<".as_bytes())
-        .expect("Write to output.cpp failed!");
-    if argument.as_bytes()[0] as char== '"'{
-        let mut temp = String::from(argument.replace("_"," "));
+    if argument_vector.len() == 1 && argument_vector[0].as_bytes()[0] as char== '"'{
+        let mut temp = String::from(argument_vector[0].replace("_"," "));
         if new_line {
             temp = temp[ .. temp.len() - 1].to_string() + r"\n" + "\"";
         }
         final_string = temp;
     }
+    if headers.iostream == false{
+        headers.iostream = true;
+    }
+    (*translated_file).write_all("std::cout<<".as_bytes())
+        .expect("Write to output.cpp failed!");
     (*translated_file).write_all(final_string.as_bytes())
         .expect("Write to output.cpp failed!");
     (*translated_file).write_all(";\n".as_bytes())
-        .expect("Write to output.cpp failed!");
-    
+        .expect("Write to output.cpp failed!"); 
 }
 
 pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,headers: &mut crate::Headers,variable_stack: & Vec<crate::Variable>){
@@ -90,14 +92,15 @@ pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,hea
     }
 }
 
-pub fn variable_assigner(translated_file: &mut fs::File,argument_vector: Vec<String>,variable_stack: &mut Vec<crate::Variable>){
+pub fn variable_assigner(translated_file: &mut fs::File,argument_vector: & Vec<String>,variable_stack: &mut Vec<crate::Variable>){
 
     //!--------WHASSDIS--------
     //! Checks if the variable name is part of the variable stack, and if it isn't, adds it to it and
     //! declares the variable in C++.
     
-    if argument_vector[1] == "be".to_string() && (argument_vector[2] == "a" || argument_vector[2] == "an"{
-    let variable_name = argument_vector[0];
+    if argument_vector[1] == "be".to_string() && (argument_vector[2] == "a" || argument_vector[2] == "an"){
+    let variable_name = argument_vector[0].clone();
+    let variable_type = argument_vector[3].clone();
     let variable_type = match variable_type.as_str(){
         "number" => crate::Variable_type::NUMBER,
         "decimal" => crate::Variable_type::DECIMAL,
