@@ -6,4 +6,4 @@ Bob read Martha.
 Bob write_line "Enter the value of Peter".
 Bob read Peter.
 Bob write "The sum of Martha and Peter is: ".
-Bob write_line Peter + Martha(Every token in Bob has to be seperated by a space, including ops).
+Bob write_line Peter plus Martha(Every token in Bob has to be seperated by a space, including ops).
