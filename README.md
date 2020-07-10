@@ -2,7 +2,7 @@
 Bob's a new language (Generates C++ code and then compiles it with g++). Say hello to Bob.
 
 # Hello World
-Bob write "Hello world!!"
+Bob write "Hello world!!".
 
 # Issues
 The currently open issues are things I'm not sure how to implement in Rust, and unwilling to devote time for right now.
