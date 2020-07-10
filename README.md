@@ -12,7 +12,7 @@ The currently open issues are things I'm not sure how to implement in Rust, and 
 2. Install g++ - apt install g++ (for Ubuntu based Linux distros)
 
 # Run
-1. cargo run main.bob (assuming main.bob is in the current directory)
+1. cargo run example.bob (assuming example.bob is in the current directory)
 2. Use ./app for running the compiled app.
 3. Access docs through cargo doc --open
 
