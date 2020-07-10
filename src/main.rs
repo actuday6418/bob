@@ -43,5 +43,5 @@ fn main() {
         .arg("app")
         .status()
         .expect("Couldn't run g++. Where's g++?");
-//   fs::remove_file("output.cpp").expect("Bob couldn't delete his temporary file");
+   fs::remove_file("output.cpp").expect("Bob couldn't delete his temporary file");
 }
