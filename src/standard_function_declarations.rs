@@ -20,13 +20,14 @@ use std::io::Write;
 /// 5. DOCUMENT your function, and you're done!
 ///---------------------------------------------------------
 
-pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument: &str, headers: &mut crate::Headers,variable_stack: & Vec<crate::Variable>){
+pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument_vector: Vec<String>, headers: &mut crate::Headers,variable_stack: & Vec<crate::Variable>){
     
     //!-----------WHASSDIS-------------
     //! Accepts a string or expression that is evaluated and written to stdout. Defines both the
-    //! write and write_line Bob functions.
+    //! write and write_line Bob functions. 
 
     let mut final_string: String = String::new();
+    let argument = argument_vector.join("");
     if headers.iostream == false{
         headers.iostream = true;
     }
@@ -89,19 +90,21 @@ pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,hea
     }
 }
 
-pub fn variable_assigner(translated_file: &mut fs::File,variable_name: &String,variable_type: &String,variable_stack: &mut Vec<crate::Variable>){
+pub fn variable_assigner(translated_file: &mut fs::File,argument_vector: Vec<String>,variable_stack: &mut Vec<crate::Variable>){
 
     //!--------WHASSDIS--------
     //! Checks if the variable name is part of the variable stack, and if it isn't, adds it to it and
     //! declares the variable in C++.
     
+    if argument_vector[1] == "be".to_string() && (argument_vector[2] == "a" || argument_vector[2] == "an"{
+    let variable_name = argument_vector[0];
     let variable_type = match variable_type.as_str(){
         "number" => crate::Variable_type::NUMBER,
         "decimal" => crate::Variable_type::DECIMAL,
         "string" => crate::Variable_type::STRING,
         _ => {
             crate::raise(crate::Error::IDENTITY_TYPE_EXPECTED);
-            crate::Variable_type::NUMBER // !! This is temporary. Raise an error here and stop execution !!
+            crate::Variable_type::NUMBER
         }
     };
     let variable: crate::Variable = crate::Variable{ variable_type: variable_type, variable_name: variable_name.clone().to_string() };
@@ -123,8 +126,8 @@ pub fn variable_assigner(translated_file: &mut fs::File,variable_name: &String,v
           .expect("Write to output.cpp failed!");
         variable_stack.push(variable);
     }
+    }
+    else{
+        crate::raise(crate::Error::VERB_EXPECTED);
+    }
 }
-
-
-
-
