@@ -27,10 +27,8 @@ pub enum Variable_type{
 }
 
 pub enum Token_type{
-    BOB_CALL,
-    PERIOD,
-    VERB,
     IDENTITY,
+    OPERATOR,
     STRING_LITERAL,
     DECIMAL_LITERAL,
     NUMBER_LITERAL,
@@ -66,9 +64,45 @@ pub fn raise(err: Error){
        }
 }
 
+pub token_assigner(query_vector: &mut Vec<String>,variable_stack: Vec<Variable>){
+	for query in query_vector{
+		if variable_stack.iter().any(|j| query == j.variable_name){
+			token_type = Token_type::IDENTITY;
+		}
+		else if match query{
+			"+" => true,
+			"-" => true,
+			"*" => true,
+			"/" => true,
+			_ => false,
+		}{
+			token_type = Token_type::OPERATOR;
+		}
+		else if query.as_bytes[0] as char == '"' && query.as_bytes[query.len() - 1] as char == '"'{
+			token_type = Token_type::STRING_LITERAL;
+		}
+		else if !query.parse::<f64>().is_err(){
+			if !query.parse::<i32>().is_err(){
+				token_type = Token_type::NUMBER_LITERAL;
+			}
+			token_type = Token_type::DECIMAL_LITERAL;
+		}
+		else{
+			raise();
+		}
+	}
+}
+		
+
+/// operators declared here and in token assigner. Iterates through the query(sentence) vector, assigns token types to each element and calls the respective functions.
 pub fn iterator(query_vector: &mut Vec<String>,translated_file: &mut fs::File,headers: &mut Headers,variable_stack: &mut Vec<Variable>){
     *query_vector = query_vector.join(" ").replace("plus","+").split_whitespace().map(String::from).collect::<Vec<String>>();
-    match query_vector[0].as_str(){
+    *query_vector = query_vector.join(" ").replace("minus","-").split_whitespace().map(String::from).collect::<Vec<String>>();
+    *query_vector = query_vector.join(" ").replace("times","*").split_whitespace().map(String::from).collect::<Vec<String>>();
+    *query_vector = query_vector.join(" ").replace("over","/").split_whitespace().map(String::from).collect::<Vec<String>>(); 
+    *query_vector = query_vector.join(" ").replace("plus","+").split_whitespace().map(String::from).collect::<Vec<String>>();
+    *query_vector = query_vector.join(" ").replace("modulo","%").split_whitespace().map(String::from).collect::<Vec<String>>();
+   match query_vector[0].as_str(){
         "write" => {
 		if query_vector[1].as_str()  == "line"{
 			standard_function_declarations::write_to_stdout(true,translated_file,&query_vector[2..].to_vec(),headers,variable_stack);
