@@ -58,6 +58,7 @@ pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,hea
     //! Accepts a string (variable name), checks if it's included in the variable stack. If it is, data is read from stdin to it.
     
     let mut variable_type: crate::Variable_type = crate::Variable_type::NUMBER;
+    //Check if the variable is in the stack
     if variable_stack.iter().any(|i| {
             if i.variable_name == variable_name.as_str() {
                 variable_type = i.variable_type.clone();
@@ -67,26 +68,36 @@ pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,hea
                 false
             }
     }
-            ){ // !! Pass the data type also and display relevant error message !!
+            ){ 
         if headers.iostream == false{
             headers.iostream = true;
         }
         if headers.limits == false{
             headers.limits = true;
         }
-        (*translated_file).write_all("while(true){std::cin>>".as_bytes())
-            .expect("Write to output.cpp failed!");
-        (*translated_file).write_all(variable_name.as_bytes())
-            .expect("Write to output.cpp failed!");
-        if variable_type == crate::Variable_type::NUMBER{
-            (*translated_file).write_all((";\nif(std::cin.fail()){\nstd::cin.clear();\nstd::cin.ignore(std::numeric_limits<std::streamsize>::max(),".to_owned() + r" '\n');" + "\nstd::cout<<\"Tell Bob a number\"<<std::endl;\n}\nelse\nbreak;\n}\n").as_bytes())
-                .expect("Write to output.cpp failed!");
-        }
-        else if variable_type == crate::Variable_type::DECIMAL{
-            (*translated_file).write_all((";\nif(std::cin.fail()){\nstd::cin.clear();\nstd::cin.ignore(std::numeric_limits<std::streamsize>::max(),".to_owned() + r" '\n');" + "\nstd::cout<<\"Tell Bob a decimal number!\"<<std::endl;\n}\nelse\nbreak;\n}\n").as_bytes())
-                .expect("Write to output.cpp failed!");
-        }
-    }
+	if variable_type == crate::Variable_type::STRING{
+		(*translated_file).write_all("getline(std::cin,".as_bytes())
+            		.expect("Write to output.cpp failed!");
+        	(*translated_file).write_all(variable_name.as_bytes())
+            		.expect("Write to output.cpp failed!");
+        	(*translated_file).write_all(");\n".as_bytes())
+            		.expect("Write to output.cpp failed!");
+	}
+	else{
+        	(*translated_file).write_all("while(true){std::cin>>".as_bytes())
+            		.expect("Write to output.cpp failed!");
+        	(*translated_file).write_all(variable_name.as_bytes())
+            		.expect("Write to output.cpp failed!");
+        	if variable_type == crate::Variable_type::NUMBER{
+            		(*translated_file).write_all((";\nif(std::cin.fail()){\nstd::cin.clear();\nstd::cin.ignore(std::numeric_limits<std::streamsize>::max(),".to_owned() + r" '\n');" + "\nstd::cout<<\"Tell Bob a number\"<<std::endl;\n}\nelse\nbreak;\n}\n").as_bytes())
+                		.expect("Write to output.cpp failed!");
+        	}
+        	else if variable_type == crate::Variable_type::DECIMAL{
+            		(*translated_file).write_all((";\nif(std::cin.fail()){\nstd::cin.clear();\nstd::cin.ignore(std::numeric_limits<std::streamsize>::max(),".to_owned() + r" '\n');" + "\nstd::cout<<\"Tell Bob a decimal number!\"<<std::endl;\n}\nelse\nbreak;\n}\n").as_bytes())
+              			.expect("Write to output.cpp failed!");
+        	}
+    	}
+	}
     else{ 
         crate::raise(crate::Error::IDENTITY_EXPECTED);
     }

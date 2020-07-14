@@ -26,7 +26,7 @@ fn main() {
     let reader = fs::File::open(&arg[1]).expect("Couldn't open that file");
     let reader = io::BufReader::new(reader);
     let mut variable_stack: Vec<bob::Variable> = Vec::new();
-    for query in reader.lines() { // !! Is this the most efficient way to iterate through each line in the source? !!
+    for query in reader.lines() { // !! Is this the most efficient way to iterate through each line in the source? Also, read sentences instead of lines !!
             let query = query.unwrap();
             let query = &(query.trim());
             let query: String = lexical_analysis::comment_remover(query);

@@ -69,9 +69,15 @@ pub fn raise(err: Error){
 pub fn iterator(query_vector: &mut Vec<String>,translated_file: &mut fs::File,headers: &mut Headers,variable_stack: &mut Vec<Variable>){
     *query_vector = query_vector.join(" ").replace("plus","+").split_whitespace().map(String::from).collect::<Vec<String>>();
     match query_vector[0].as_str(){
-        "write" => standard_function_declarations::write_to_stdout(false,translated_file,&query_vector[1..].to_vec(),headers,variable_stack),
-        "write_line" => standard_function_declarations::write_to_stdout(true,translated_file,&query_vector[1..].to_vec(),headers,variable_stack),
-        "read" => standard_function_declarations::read_from_stdin(translated_file,&query_vector[1],headers,variable_stack),
+        "write" => {
+		if query_vector[1].as_str()  == "line"{
+			standard_function_declarations::write_to_stdout(true,translated_file,&query_vector[2..].to_vec(),headers,variable_stack);
+		}
+		else{		
+		standard_function_declarations::write_to_stdout(false,translated_file,&query_vector[1..].to_vec(),headers,variable_stack);
+                }
+		}
+	"read" => standard_function_declarations::read_from_stdin(translated_file,&query_vector[1],headers,variable_stack),
         "let" => standard_function_declarations::variable_assigner(translated_file,&query_vector[1..].to_vec(),variable_stack),
         _ => raise(Error::VERB_EXPECTED),
     }
@@ -92,16 +98,16 @@ fn text_prepender_and_curly_appender(data: String){
         .open("output.cpp")
         .expect("Unable to create a temporary resource");   
 
-    temp_file.write_all(data.as_bytes());
+    temp_file.write_all(data.as_bytes()).expect("Unable to write to temp file");
     let mut buffer = [0u8; 4096];
     loop {
       let nbytes = translated_file.read(&mut buffer).expect("Unable to read from file");
       temp_file.write_all(&buffer[..nbytes]).expect("Unable to write buffer");
       if nbytes < buffer.len() { break; }
    }
-    temp_file.write_all("}".as_bytes());
-    fs::remove_file("output.cpp");
-    fs::rename("swapper.cpp","output.cpp");
+    temp_file.write_all("}".as_bytes()).expect("Unable to write to temp file");
+    fs::remove_file("output.cpp").expect("file op failed");
+    fs::rename("swapper.cpp","output.cpp").expect("file op failed");
 }
 
 pub fn header_and_token_includer(headers: Headers){
