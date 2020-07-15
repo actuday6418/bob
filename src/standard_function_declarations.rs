@@ -6,8 +6,8 @@ use std::io::Write;
 ///    the iterator function in lib.rs.
 ///
 /// 2. Define your function in this file, with the file handle to output.cpp as an
-///    argument(translated_file). The argument names here and function(verb) name, both in Bob and here, must be in snake case. You may use the same 
-///    function definition for similar Bob verbs. For example both write_line and write Bob
+///    argument(translated_file). The argument names here and function(verb) name, both in Bob and here, must be in lower case. You may use the same 
+///    function definition for similar Bob verbs. For example both write line and write Bob
 ///    functions are defined in write_to_stdout, differentiated only by a boolean argument(new_line).
 /// 
 /// 3. Add whatever header your C++ code depends on to the Headers struct in lib.rs. Initialize the header name (bool value) to false when the enum Headers is
@@ -20,14 +20,30 @@ use std::io::Write;
 /// 5. DOCUMENT your function, and you're done!
 ///---------------------------------------------------------
 
-pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument_vector: & Vec<String>, headers: &mut crate::Headers,variable_stack: & Vec<crate::Variable>){
+pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument_vector: & Vec<(String,crate::Token_type)>, headers: &mut crate::Headers){
     //!-----------WHASSDIS-------------
     //! Accepts a string or expression that is evaluated and written to stdout. Defines both the
     //! write and write_line Bob functions. 
 
     let mut final_string: String = String::new();
+    let mut is_valid: bool = false;
+    if match argument_vector[0].1{ 
+	crate::Token_type::NUMBER_IDENTITY | crate::Token_type::DECIMAL_IDENTITY  => 
+	crate::Token_type::STRING_LITERAL => {
+		if argument_vector.last().1 == crate::Token_type::STRING_LITERAL || argument_vector.last().1 == crate::Token_type::STRING_IDENTITY{
+		for i in range (1,argument_vector.len()).step_by(2){
+				if argument_vector[i].1 == crate::Token_type::OPERATOR_PLUS && 
+				   (argument_vector[i-1].1 == crate::Token_type::STRING_LITERAL || argument_vector[i-1].1 == crate::Token_type::STRING_LITERAL){
+					final_string = argument_vector.iter()->0.collect::<Vec<String>>().join();
+				}
+		}
+		}
+	}
+	_ => false,
+	}{
+	} 
     if argument_vector.iter()
-        .all(|i| (variable_stack.iter().any(|j| j.variable_name == *i) || vec!["+".to_string(),"-".to_string()].iter().any(|j| j == i))){
+        .all(|i| (variable_stack.iter().any(|j| j.variable_name == *i.0) || vec!["+".to_string(),"-".to_string()].iter().any(|j| j == i.0))){
         let argument = argument_vector.join("");
             final_string = argument.to_string().clone();
             if new_line{

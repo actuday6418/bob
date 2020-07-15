@@ -12,6 +12,7 @@ pub enum Error{
     IDENTITY_TYPE_EXPECTED,
     IDENTITY_EXISTS,
     IDENTITY_EXPECTED,
+    TOKEN_EXPECTED,
 }
 
 pub struct Headers{
@@ -25,10 +26,13 @@ pub enum Variable_type{
     DECIMAL,
     STRING,
 }
-
+#[derive(PartialEq, Eq)]
 pub enum Token_type{
-    IDENTITY,
-    OPERATOR,
+    STRING_IDENTITY,
+    NUMBER_IDENTITY,
+    DECIMAL_IDENTITY,
+    OPERATOR_PLUS,
+    OTHER_OPERATOR_ARITHMETIC,
     STRING_LITERAL,
     DECIMAL_LITERAL,
     NUMBER_LITERAL,
@@ -61,13 +65,28 @@ pub fn raise(err: Error){
        Error::IDENTITY_TYPE_EXPECTED => panic!("Expected a variable type!"),
        Error::IDENTITY_EXISTS => panic!("The identity you're trying to declare already exists!"),
        Error::IDENTITY_EXPECTED => panic!("Name an identity!"),
+       Error::TOKEN_EXPECTED => panic!("Token expected!"),
        }
 }
 
-pub token_assigner(query_vector: &mut Vec<String>,variable_stack: Vec<Variable>){
+pub token_assigner(query_vector: &mut Vec<String>,variable_stack: Vec<Variable>) -> Vec<(String,Token_type)>{
+	let mut token_vector: Vec<(String,Token_type)> = vec::new();
+	let temp: Variable_type = Variable_type::NUMBER;
 	for query in query_vector{
-		if variable_stack.iter().any(|j| query == j.variable_name){
-			token_type = Token_type::IDENTITY;
+		if variable_stack.iter().any(|j| {
+			if query == j.variable_name
+				temp = j.variable_type;
+				true
+				}){
+			if temp == NUMBER{
+				token_vector.push((query,Token_type::NUMBER_IDENTITY));
+			}
+			if temp == DECIMAL{
+				token_vector.push((query,Token_type::DECIMAL_IDENTITY));
+			}
+			if temp == STRING{
+				token_vector.push((query,Token_type::STRING_IDENTITY));
+			}
 		}
 		else if match query{
 			"+" => true,
@@ -76,21 +95,22 @@ pub token_assigner(query_vector: &mut Vec<String>,variable_stack: Vec<Variable>)
 			"/" => true,
 			_ => false,
 		}{
-			token_type = Token_type::OPERATOR;
+			token_vector.push((query,Token_type::OPERATOR));
 		}
 		else if query.as_bytes[0] as char == '"' && query.as_bytes[query.len() - 1] as char == '"'{
-			token_type = Token_type::STRING_LITERAL;
+			token_vector.push((query,Token_type::STRING_LITERAL));
 		}
 		else if !query.parse::<f64>().is_err(){
 			if !query.parse::<i32>().is_err(){
-				token_type = Token_type::NUMBER_LITERAL;
+			token_vector.push((query,Token_type::NUMBER_LITERAL));
 			}
-			token_type = Token_type::DECIMAL_LITERAL;
+			token_vector.push((query,Token_type::DECIMAL_LITERAL));
 		}
 		else{
-			raise();
+			raise(Error::TOKEN_EXPECTED);
 		}
 	}
+	token_vector
 }
 		
 
@@ -105,10 +125,10 @@ pub fn iterator(query_vector: &mut Vec<String>,translated_file: &mut fs::File,he
    match query_vector[0].as_str(){
         "write" => {
 		if query_vector[1].as_str()  == "line"{
-			standard_function_declarations::write_to_stdout(true,translated_file,&query_vector[2..].to_vec(),headers,variable_stack);
+			standard_function_declarations::write_to_stdout(true,translated_file,&token_assigner(query_vector[2..].to_vec()),headers);
 		}
 		else{		
-		standard_function_declarations::write_to_stdout(false,translated_file,&query_vector[1..].to_vec(),headers,variable_stack);
+		standard_function_declarations::write_to_stdout(false,translated_file,&token_assigner(query_vector[1..].to_vec()),headers);
                 }
 		}
 	"read" => standard_function_declarations::read_from_stdin(translated_file,&query_vector[1],headers,variable_stack),
