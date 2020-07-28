@@ -73,7 +73,7 @@ pub fn raise(err: Error){
 
 pub fn token_assigner(query_vector: &mut Vec<String>,variable_stack: &mut Vec<Variable>) -> Vec<(String,Token_type)>{
 	let mut token_vector: Vec<(String,Token_type)> = Vec::new();
-	let temp: Variable_type = Variable_type::NUMBER;
+	let mut temp: Variable_type = Variable_type::NUMBER;
 	for query in query_vector{
         let query = query.to_string();
 		if variable_stack.iter().any(|j| {
@@ -88,17 +88,17 @@ pub fn token_assigner(query_vector: &mut Vec<String>,variable_stack: &mut Vec<Va
 			if temp == Variable_type::NUMBER {
 				token_vector.push((query,Token_type::NUMBER_IDENTITY));
 			} 
-			if temp == Variable_type::DECIMAL {
+			else if temp == Variable_type::DECIMAL {
 				token_vector.push((query,Token_type::DECIMAL_IDENTITY));
 			} 
-			if temp == Variable_type::STRING {
+			else if temp == Variable_type::STRING {
 				token_vector.push((query,Token_type::STRING_IDENTITY));
 			}
 		}
-		else if match query {
-			"-".to_string() => true,
-			"*".to_string() => true,
-			"/".to_string() => true,
+		else if match query.as_str() {
+			"-" => true,
+			"*" => true,
+			"/" => true,
 			_ => false,
 		}{
 			token_vector.push((query,Token_type::OTHER_OPERATOR_ARITHMETIC));
@@ -113,7 +113,9 @@ pub fn token_assigner(query_vector: &mut Vec<String>,variable_stack: &mut Vec<Va
 			if !query.parse::<i32>().is_err(){
 			token_vector.push((query,Token_type::NUMBER_LITERAL));
 			}
+            else {
 			token_vector.push((query,Token_type::DECIMAL_LITERAL));
+            }
 		}
 		else{
 			raise(Error::TOKEN_EXPECTED);
