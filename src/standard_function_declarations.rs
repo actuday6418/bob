@@ -6,7 +6,7 @@ use std::io::Write;
 ///    the iterator function in lib.rs.
 ///
 /// 2. Define your function in this file, with the file handle to output.cpp as an
-///    argument(translated_file). The argument names here and function(verb) name, both in Bob and here, must be in lower case. You may use the same 
+///    argument(translated_file). The argument names and function(verb) name, both in Bob and here, must be in lower case. You may use the same 
 ///    function definition for similar Bob verbs. For example both write line and write Bob
 ///    functions are defined in write_to_stdout, differentiated only by a boolean argument(new_line).
 /// 
@@ -27,31 +27,34 @@ pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument_ve
 
     let mut final_string: String = String::new();
     let mut is_valid: bool = false;
-    if match argument_vector[0].1{ 
-	crate::Token_type::NUMBER_IDENTITY | crate::Token_type::DECIMAL_IDENTITY  => 
-	crate::Token_type::STRING_LITERAL => {
+    is_valid = match argument_vector[0].1{
+    //Check if the expression is a numeral (decimal or number)
+	crate::Token_type::NUMBER_IDENTITY | crate::Token_type::DECIMAL_IDENTITY  => true,
+	//Check if the expression is a valid string and string literal expression of the form str1+str2..
+    crate::Token_type::STRING_LITERAL => {
 		if argument_vector.last().1 == crate::Token_type::STRING_LITERAL || argument_vector.last().1 == crate::Token_type::STRING_IDENTITY{
 		for i in range (1,argument_vector.len()).step_by(2){
 				if argument_vector[i].1 == crate::Token_type::OPERATOR_PLUS && 
 				   (argument_vector[i-1].1 == crate::Token_type::STRING_LITERAL || argument_vector[i-1].1 == crate::Token_type::STRING_LITERAL){
-					final_string = argument_vector.iter()->0.collect::<Vec<String>>().join();
-				}
+					final_string = argument_vector.iter().map(|x| x.0).collect::<Vec<String>>().join();
+				    true
+                   }
 		}
 		}
 	}
 	_ => false,
-	}{
-	} 
+	}
+    if is_valid {
     if argument_vector.iter()
-        .all(|i| (variable_stack.iter().any(|j| j.variable_name == *i.0) || vec!["+".to_string(),"-".to_string()].iter().any(|j| j == i.0))){
-        let argument = argument_vector.join("");
+        .all(|i| (variable_stack.iter().any(|j| j.variable_name == *i.0) || vec!["+".to_string(),"-".to_string()].iter().any(|j| *j == i.0))){
+        let argument = argument_vector.into_iter().map(|x| x.0 ).collect::<Vec<String>().join("");
             final_string = argument.to_string().clone();
             if new_line{
                 final_string += "<<std::endl";
             }
     }
-    else if argument_vector.len() == 1 && argument_vector[0].as_bytes()[0] as char== '"'{
-        let mut temp = String::from(argument_vector[0].replace("_"," "));
+    else if argument_vector.len() == 1 && argument_vector[0].0.as_bytes()[0] as char== '"'{
+        let mut temp = String::from(argument_vector[0].0.replace("_"," "));
         if new_line {
             temp = temp[ .. temp.len() - 1].to_string() + r"\n" + "\"";
         }
@@ -66,6 +69,10 @@ pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument_ve
         .expect("Write to output.cpp failed!");
     (*translated_file).write_all(";\n".as_bytes())
         .expect("Write to output.cpp failed!"); 
+    }
+    else {
+        crate::raise(crate::Error::EXPRESSION_INVALID);
+    }
 }
 
 pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,headers: &mut crate::Headers,variable_stack: & Vec<crate::Variable>){
