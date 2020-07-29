@@ -23,6 +23,9 @@ fn main() {
     let mut headers: bob::Headers = bob::Headers{iostream: false,limits: false};
     let arg: Vec<String> = env::args().collect();
     // uses a reader buffer
+    if arg.len() != 2 {
+        panic!("Enter the name of the Bob source file!");
+    }
     let reader = fs::File::open(&arg[1]).expect("Couldn't open that file");
     let reader = io::BufReader::new(reader);
     let mut variable_stack: Vec<bob::Variable> = Vec::new();

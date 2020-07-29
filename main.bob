@@ -1,4 +1,4 @@
 (Program to display area pf a circle) Bob let Radius be a decimal.
 Bob write line "Enter the radius".
 Bob read Radius.
-Bob write line 3.14 * Radius.
+Bob write line "vf".

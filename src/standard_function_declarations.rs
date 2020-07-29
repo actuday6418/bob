@@ -37,7 +37,8 @@ pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument_ve
     crate::Token_type::STRING_LITERAL | crate::Token_type::STRING_IDENTITY=> { 
         let mut return_bool: bool = false;
         is_valid.1 = crate::Token_type::STRING_LITERAL;
-		if argument_vector.last().unwrap().1 == crate::Token_type::STRING_LITERAL || argument_vector.last().unwrap().1 == crate::Token_type::STRING_IDENTITY {
+		if (argument_vector.last().unwrap().1 == crate::Token_type::STRING_LITERAL || argument_vector.last().unwrap().1 == crate::Token_type::STRING_IDENTITY)
+            && argument_vector.len() != 1{
     		for i in (1..argument_vector.len()).step_by(2){
 	    			if argument_vector[i].1 == crate::Token_type::OPERATOR_PLUS && 
 		    		   (argument_vector[i-1].1 == crate::Token_type::STRING_LITERAL || argument_vector[i-1].1 == crate::Token_type::STRING_LITERAL){
@@ -49,8 +50,11 @@ pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument_ve
                        break;
                    }
 		    }
+            return_bool
 		}
-	return_bool
+        else {
+            true
+        }
     }
 	_ => false,
 	};
