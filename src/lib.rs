@@ -19,6 +19,7 @@ pub enum Error{
 pub struct Headers{
     pub iostream: bool,
     pub limits: bool,
+    pub string: bool,
 }
 
 #[derive(PartialEq, Eq, Clone, Copy)]
@@ -143,7 +144,7 @@ pub fn iterator(query_vector: &mut Vec<String>,translated_file: &mut fs::File,he
                 }
 		}
 	"read" => standard_function_declarations::read_from_stdin(translated_file,&query_vector[1],headers,variable_stack),
-        "let" => standard_function_declarations::variable_assigner(translated_file,&query_vector[1..].to_vec(),variable_stack),
+        "let" => standard_function_declarations::variable_assigner(translated_file,&query_vector[1..].to_vec(),headers,variable_stack),
         _ => raise(Error::VERB_EXPECTED),
     }
 
@@ -177,11 +178,14 @@ fn text_prepender_and_curly_appender(data: String){
 
 pub fn header_and_token_includer(headers: Headers){
     let mut data: String = String::from("//This is a temp\n");
-    if headers.iostream == true{
+    if headers.iostream == true {
         data += "#include<iostream>\n"
     }
-    if headers.limits == true{
+    if headers.limits == true {
         data += "#include<limits>\n"
+    }
+    if headers.string == true {
+        data += "#include<string>\n"
     }
     data += "int main(){\n";
     text_prepender_and_curly_appender(data);

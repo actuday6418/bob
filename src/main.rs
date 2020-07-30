@@ -20,7 +20,7 @@ fn main() {
         .append(true)
         .open("output.cpp")
         .expect("File creation failed");
-    let mut headers: bob::Headers = bob::Headers{iostream: false,limits: false};
+    let mut headers: bob::Headers = bob::Headers{ iostream: false, limits: false, string: false};
     let arg: Vec<String> = env::args().collect();
     // uses a reader buffer
     if arg.len() != 2 {
@@ -33,6 +33,9 @@ fn main() {
             let query = query.unwrap();
             let query = &(query.trim());
             let query: String = lexical_analysis::comment_remover(query);
+            if query.len() == 0 {
+                continue;
+            }
             let query: String = lexical_analysis::string_space_remover(query);
             let mut query: String = lexical_analysis::bob_and_punctuation_remover(query);
             let mut query_vector: Vec<String> = query.split_whitespace().map(String::from).collect::<Vec<String>>();

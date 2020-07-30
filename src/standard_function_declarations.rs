@@ -38,18 +38,21 @@ pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument_ve
         let mut return_bool: bool = false;
         is_valid.1 = crate::Token_type::STRING_LITERAL;
 		if (argument_vector.last().unwrap().1 == crate::Token_type::STRING_LITERAL || argument_vector.last().unwrap().1 == crate::Token_type::STRING_IDENTITY)
-            && argument_vector.len() != 1{
+            && argument_vector.len() != 1 {
     		for i in (1..argument_vector.len()).step_by(2){
 	    			if argument_vector[i].1 == crate::Token_type::OPERATOR_PLUS && 
-		    		   (argument_vector[i-1].1 == crate::Token_type::STRING_LITERAL || argument_vector[i-1].1 == crate::Token_type::STRING_LITERAL){
-			    		final_string = argument_vector.iter().map(|x| x.0.clone()).collect::<Vec<String>>().join("");
+		    		   (argument_vector[i-1].1 == crate::Token_type::STRING_LITERAL || argument_vector[i-1].1 == crate::Token_type::STRING_IDENTITY) {
 				        return_bool = true;
                    }
                    else {
+                       println!("DWE");
                        return_bool = false;
                        break;
                    }
 		    }
+            if return_bool {
+			    final_string = argument_vector.iter().map(|x| x.0.clone()).collect::<Vec<String>>().join("");
+            }
             return_bool
 		}
         else {
@@ -67,16 +70,13 @@ pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument_ve
             }
     }
     else if is_valid.1 == crate::Token_type::STRING_LITERAL {
-        let mut temp = String::from(argument_vector[0].0.replace("_"," "));
+        let mut temp = String::from(argument_vector.into_iter().map(|x| x.0.clone()).collect::<Vec<String>>().join("").replace("_"," "));
         if new_line {
-            temp = temp[ .. temp.len() - 1].to_string() + r"\n" + "\"";
+            temp += "<<std::endl";
         }
         final_string = temp;
     }
-
-    if headers.iostream == false{
         headers.iostream = true;
-    }
     (*translated_file).write_all("std::cout<<".as_bytes())
         .expect("Write to output.cpp failed!");
     (*translated_file).write_all(final_string.as_bytes())
@@ -106,12 +106,8 @@ pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,hea
             }
     }
             ){ 
-        if headers.iostream == false{
             headers.iostream = true;
-        }
-        if headers.limits == false{
             headers.limits = true;
-        }
 	if variable_type == crate::Variable_type::STRING{
 		(*translated_file).write_all("getline(std::cin,".as_bytes())
             		.expect("Write to output.cpp failed!");
@@ -140,7 +136,7 @@ pub fn read_from_stdin(translated_file: &mut fs::File,variable_name: &String,hea
     }
 }
 
-pub fn variable_assigner(translated_file: &mut fs::File,argument_vector: & Vec<String>,variable_stack: &mut Vec<crate::Variable>){
+pub fn variable_assigner(translated_file: &mut fs::File,argument_vector: & Vec<String>,headers: &mut crate::Headers, variable_stack: &mut Vec<crate::Variable>){
 
     //!--------WHASSDIS--------
     //! Checks if the variable name is part of the variable stack, and if it isn't, adds it to it and
@@ -168,8 +164,10 @@ pub fn variable_assigner(translated_file: &mut fs::File,argument_vector: & Vec<S
                                            .expect("Write to output.cpp failed!"),
             crate::Variable_type::DECIMAL => (*translated_file).write_all("float ".as_bytes())
                                            .expect("Write to output.cpp failed!"),
-            crate::Variable_type::STRING => (*translated_file).write_all("std::string ".as_bytes())
-                                           .expect("Write to output.cpp failed!"),
+            crate::Variable_type::STRING =>{ (*translated_file).write_all("std::string ".as_bytes())
+                                           .expect("Write to output.cpp failed!");
+                                             headers.string = true;
+            }
         }
         (*translated_file).write_all(variable.variable_name.as_bytes())
           .expect("Write to output.cpp failed!");
