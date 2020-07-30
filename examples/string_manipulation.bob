@@ -1,0 +1,5 @@
+(This is a program that demonstrates string concatenation in Bob)
+Bob let Allan be a string.
+Bob write "Enter your name: ".
+Bob read Allan.
+Bob write line "Your name is " + Allan.

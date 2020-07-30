@@ -5,7 +5,7 @@ Bob's a new language (Generates C++ code and then compiles it with g++). Say hel
 Bob write "Hello world!!".
 
 # Issues
-The currently open issues are things I'm not sure how to implement in Rust, and unwilling to devote time for right now.
+The currently open issues are things I haven't put time in to see how to implement in Rust. They're still valuable things a new comer to the code base and Rust could easily do.
 
 # Dependencies
 1. Install rust - https://www.rust-lang.org/tools/install.
@@ -26,14 +26,26 @@ Check out the file main.bob in the root of this repository.
 4. Every token in Bob must be separated by whitespace.
 5. Function names in Bob are called verbs.
 6. A verb HAS to follow the Bob call, as it is put.
-7. Sentences may contain expressions (under development), which are evaluated into arguments for each verb. Verbs that return a value may be used as expressions.
+7. Sentences may contain expressions, which are evaluated into arguments for each verb. Verbs that return a value may be used as expressions(to be implemented).
 8. Comments in Bob go in between brackets.
-9. Currently verbs may have only one argument in Bob. This will be changed to function_name argument1 argument_name argument2 ..
-   eg. Bob write find_power_of 3 raised_to 4.
+9. Currently verbs may have only one argument in Bob. This will be changed to function name argument1 argument name argument2 ..
+   eg. Bob write line "Name: " + Martha.
+10. Variables in Bob are called Identities. Expressions like "sqws" or 5 are called literals, 5 being a number literal and "sqws" being a string literal.
 
 # Implemented Verbs
 1. write - writes to stdout.
-2. write_line - writes to stdout after appending a newline to argument string.
+2. write line - writes to stdout after appending a newline to argument string.
 3. read - reads from stdin.
 4. let - declares a variable.
 
+# Implemented Types
+1. number
+2. decimal
+3. string
+
+# Expressions and operators
+1. Arithmetic operators like +,-,/,% may be used. Their written counterparts like plus, minus, modulo, etc, may also be used.
+2. strings may be concatenated with +. String identities and literals may be used together for this. Currently other types cannot be used along string literals and identities, but that'll be implemented in the future.
+
+# Vim plugin
+A vim plugin is available for Bob that currently supports text highlighting, and will be able to do autocompletion in the near future as well. Repo is at https://github.com/actuday6418/bob-vim
