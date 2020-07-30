@@ -11,10 +11,13 @@ The currently open issues are things I haven't put time in to see how to impleme
 1. Install rust - https://www.rust-lang.org/tools/install.
 2. Install g++ - apt install g++ (for Ubuntu based Linux distros)
 
-# Run
-1. cargo run example.bob (assuming example.bob is in the current directory)
+# Running debug
+1. cargo run example.bob (assuming example.bob is in the working directory)
 2. Use ./app for running the compiled app.
 3. Access docs through cargo doc --open
+
+# Running release
+1. bob example.bob
 
 # Example
 Check out the file main.bob in the root of this repository.
