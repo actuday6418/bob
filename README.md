@@ -17,7 +17,7 @@ The currently open issues are things I haven't put time in to see how to impleme
 3. Access docs through cargo doc --open
 
 # Running release
-./bob example.bob
+		./bob example.bob
 
 # Example
 Check out the file main.bob in the root of this repository.
