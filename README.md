@@ -16,6 +16,16 @@ The currently open issues are things I haven't put time in to see how to impleme
 2. Use ./app for running the compiled app.
 3. Access docs through cargo doc --open
 
+# Setting up an environment on Android 
+1. install and setup termux or another terminal emulator for android. 
+2. run the script 
+		curl https://its-pointless.github.io/setup-pointless-repo.sh | bash
+3. Run
+		pkg install rust
+4. Clone and build Bob as normal!
+5. Follow the same old instructions to setup the Vim plugin.
+6. You can get the release for armv7 directly from this repository, instead of having to install ruust from an unreliable community maintained repository .
+
 # Running release
 		./bob example.bob
 
