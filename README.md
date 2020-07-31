@@ -29,8 +29,8 @@ The currently open issues are things I haven't put time in to see how to impleme
 # Running release
 		./bob example.bob
 
-# Example
-Check out the file main.bob in the root of this repository.
+# Examples
+Check out the files in the examples directory.
 
 # Overview of the syntax
 1. Bob statements are called sentences.
