@@ -4,4 +4,7 @@ Bob let Radius be a number.
 Bob read Radius.
 Bob write "Area: ".
 Bob write Radius * Radius * 3.14.
-Bob write line "metres".
+Bob write line " metre square".
+Bob write "Perimeter: ".
+Bob write { 2 * Radius } * 3.14.
+Bob write line " metres".

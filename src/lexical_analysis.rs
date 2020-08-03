@@ -1,6 +1,6 @@
 ///-----------------Everything that has to do with verifying and pre-processing syntax goes here-----
 
-pub fn string_space_remover(query: String) -> String{
+pub fn string_space_remover_and_bracket_replacer(query: String) -> String{
     let mut i: usize = 0;
     let mut j: usize;
     let mut flag: bool;
@@ -31,6 +31,8 @@ pub fn string_space_remover(query: String) -> String{
       t.insert_str(x.1,&query[x.1 ..]);
       query = t;
     }
+    query = query.replace("}",")");
+    query = query.replace("{","(");
     query
 }
 

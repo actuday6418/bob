@@ -28,24 +28,21 @@ pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument_ve
     let mut final_string: String = String::new();
     let mut is_valid: (bool,crate::Token_type) = (false,crate::Token_type::NUMBER_IDENTITY);
     is_valid.0 = match argument_vector[0].1{
-    //Check if the expression is a numeral (decimal or number)
-	crate::Token_type::NUMBER_IDENTITY | crate::Token_type::DECIMAL_IDENTITY  => {
-        is_valid.1 = crate::Token_type::NUMBER_IDENTITY;
-        true
-    },
-	//Check if the expression is a valid string and string literal expression of the form str1+str2..
-    crate::Token_type::STRING_LITERAL | crate::Token_type::STRING_IDENTITY=> { 
+    //Check if the expression is a valid numeral expression (decimal or number)
+	crate::Token_type::NUMBER_IDENTITY | crate::Token_type::DECIMAL_IDENTITY |  crate::Token_type::NUMBER_LITERAL | crate::Token_type::DECIMAL_LITERAL => {
         let mut return_bool: bool = false;
-        is_valid.1 = crate::Token_type::STRING_LITERAL;
-		if (argument_vector.last().unwrap().1 == crate::Token_type::STRING_LITERAL || argument_vector.last().unwrap().1 == crate::Token_type::STRING_IDENTITY)
-            && argument_vector.len() != 1 {
+        is_valid.1 = crate::Token_type::NUMBER_IDENTITY;
+        if argument_vector.len() != 1 {
+		if argument_vector.last().unwrap().1 == crate::Token_type::NUMBER_IDENTITY || argument_vector.last().unwrap().1 == crate::Token_type::DECIMAL_IDENTITY
+            || argument_vector.last().unwrap().1 == crate::Token_type::NUMBER_LITERAL || argument_vector.last().unwrap().1 == crate::Token_type::DECIMAL_LITERAL
+            {
     		for i in (1..argument_vector.len()).step_by(2){
-	    			if argument_vector[i].1 == crate::Token_type::OPERATOR_PLUS && 
-		    		   (argument_vector[i-1].1 == crate::Token_type::STRING_LITERAL || argument_vector[i-1].1 == crate::Token_type::STRING_IDENTITY) {
+	    			if (argument_vector[i].1 == crate::Token_type::OPERATOR_PLUS || argument_vector[i].1 == crate::Token_type::OTHER_OPERATOR_ARITHMETIC) && 
+		argument_vector[i-1].1 == crate::Token_type::NUMBER_IDENTITY || argument_vector[i-1].1 == crate::Token_type::DECIMAL_IDENTITY
+            || argument_vector[i-1].1 == crate::Token_type::NUMBER_LITERAL || argument_vector[i-1].1 == crate::Token_type::DECIMAL_LITERAL {
 				        return_bool = true;
                    }
                    else {
-                       println!("DWE");
                        return_bool = false;
                        break;
                    }
@@ -55,6 +52,40 @@ pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument_ve
             }
             return_bool
 		}
+        else {
+            return_bool
+        }
+        }
+        else {
+            true
+        }
+    },
+	//Check if the expression is a valid string and string literal expression of the form str1+str2..
+    crate::Token_type::STRING_LITERAL | crate::Token_type::STRING_IDENTITY=> { 
+        let mut return_bool: bool = false;
+        is_valid.1 = crate::Token_type::STRING_LITERAL;
+        if argument_vector.len() != 1 {
+		if argument_vector.last().unwrap().1 == crate::Token_type::STRING_LITERAL || argument_vector.last().unwrap().1 == crate::Token_type::STRING_IDENTITY
+            {
+    		for i in (1..argument_vector.len()).step_by(2){
+	    			if argument_vector[i].1 == crate::Token_type::OPERATOR_PLUS && 
+		    		   (argument_vector[i-1].1 == crate::Token_type::STRING_LITERAL || argument_vector[i-1].1 == crate::Token_type::STRING_IDENTITY) {
+				        return_bool = true;
+                   }
+                   else {
+                       return_bool = false;
+                       break;
+                   }
+		    }
+            if return_bool {
+			    final_string = argument_vector.iter().map(|x| x.0.clone()).collect::<Vec<String>>().join("");
+            }
+            return_bool
+		}
+        else {
+            return_bool
+        }
+        }
         else {
             true
         }

@@ -100,6 +100,9 @@ pub fn token_assigner(query_vector: &mut Vec<String>,variable_stack: &mut Vec<Va
 			"-" => true,
 			"*" => true,
 			"/" => true,
+            ")" => true,
+            "(" => true,
+            "%" => true,
 			_ => false,
 		}{
 			token_vector.push((query,Token_type::OTHER_OPERATOR_ARITHMETIC));
