@@ -3,5 +3,5 @@ Bob write "Enter the Radius of the circle in metres: ".
 Bob let Radius be a number. 
 Bob read Radius.
 Bob write "Area: ".
-Bob write Radius * Radius * 3.14.
+Bob write { Radius * Radius } * 3.14.
 Bob write line "metres".

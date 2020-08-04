@@ -27,19 +27,23 @@ pub fn write_to_stdout(new_line: bool,translated_file: &mut fs::File,argument_ve
 
     let mut final_string: String = String::new();
     let mut is_valid: (bool,crate::Token_type) = (false,crate::Token_type::NUMBER_IDENTITY);
-    is_valid.0 = match argument_vector[0].1{
+    //remove all instances of the precedednce operator from the expression to be checked
+    let mut temp_expression: Vec<(String,crate::Token_type)> = argument_vector.clone();
+    temp_expression.retain(|x| if x.0 =="(" || x.0 == ")" {false} else {true});
+    for x in &temp_expression { println!("{}",x.0);} println!("{}",temp_expression.len());
+    is_valid.0 = match temp_expression[0].1{
     //Check if the expression is a valid numeral expression (decimal or number)
 	crate::Token_type::NUMBER_IDENTITY | crate::Token_type::DECIMAL_IDENTITY |  crate::Token_type::NUMBER_LITERAL | crate::Token_type::DECIMAL_LITERAL => {
         let mut return_bool: bool = false;
         is_valid.1 = crate::Token_type::NUMBER_IDENTITY;
-        if argument_vector.len() != 1 {
-		if argument_vector.last().unwrap().1 == crate::Token_type::NUMBER_IDENTITY || argument_vector.last().unwrap().1 == crate::Token_type::DECIMAL_IDENTITY
-            || argument_vector.last().unwrap().1 == crate::Token_type::NUMBER_LITERAL || argument_vector.last().unwrap().1 == crate::Token_type::DECIMAL_LITERAL
+        if temp_expression.len() != 1 {
+		if temp_expression.last().unwrap().1 == crate::Token_type::NUMBER_IDENTITY || argument_vector.last().unwrap().1 == crate::Token_type::DECIMAL_IDENTITY
+            || temp_expression.last().unwrap().1 == crate::Token_type::NUMBER_LITERAL || argument_vector.last().unwrap().1 == crate::Token_type::DECIMAL_LITERAL
             {
-    		for i in (1..argument_vector.len()).step_by(2){
-	    			if (argument_vector[i].1 == crate::Token_type::OPERATOR_PLUS || argument_vector[i].1 == crate::Token_type::OTHER_OPERATOR_ARITHMETIC) && 
-		argument_vector[i-1].1 == crate::Token_type::NUMBER_IDENTITY || argument_vector[i-1].1 == crate::Token_type::DECIMAL_IDENTITY
-            || argument_vector[i-1].1 == crate::Token_type::NUMBER_LITERAL || argument_vector[i-1].1 == crate::Token_type::DECIMAL_LITERAL {
+    		for i in (1..temp_expression.len()).step_by(2){
+	    			if (temp_expression[i].1 == crate::Token_type::OPERATOR_PLUS || argument_vector[i].1 == crate::Token_type::OTHER_OPERATOR_ARITHMETIC) && 
+		temp_expression[i-1].1 == crate::Token_type::NUMBER_IDENTITY || argument_vector[i-1].1 == crate::Token_type::DECIMAL_IDENTITY
+            || temp_expression[i-1].1 == crate::Token_type::NUMBER_LITERAL || argument_vector[i-1].1 == crate::Token_type::DECIMAL_LITERAL {
 				        return_bool = true;
                    }
                    else {

@@ -28,7 +28,7 @@ pub enum Variable_type{
     DECIMAL,
     STRING,
 }
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub enum Token_type{
     STRING_IDENTITY,
     NUMBER_IDENTITY,
