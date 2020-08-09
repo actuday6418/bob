@@ -60,5 +60,8 @@ Check out the files in the examples directory.
 1. Arithmetic operators like +,-,/,% may be used. Their written counterparts like plus, minus, modulo, etc, may also be used.
 2. strings may be concatenated with +. String identities and literals may be used together for this. Currently other types cannot be used along string literals and identities, but that'll be implemented in the future.
 
+# TODO
+Things to be implemented are mentioned here. (This is a short term roadmap)
+
 # Vim plugin
 A vim plugin is available for Bob that currently supports text highlighting, and will be able to do autocompletion in the near future as well. Repo is at https://github.com/actuday6418/bob-vim
