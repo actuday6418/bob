@@ -23,131 +23,27 @@ use std::io::Write;
 pub fn write_to_stdout(
     new_line: bool,
     translated_file: &mut fs::File,
-    argument_vector: &Vec<(String, crate::Token_type)>,
+    expression_type_vector_and_expressions: &(Vec<crate::Expression_type>, Vec<String>),
     headers: &mut crate::Headers,
 ) {
     //!-----------WHASSDIS-------------
     //! Accepts a string or expression that is evaluated and written to stdout. Defines both the
     //! write and write_line Bob functions.
-
-    let mut final_string: String = String::new();
-    let mut is_valid: (bool, crate::Token_type) = (false, crate::Token_type::NUMBER_IDENTITY);
-    //remove all instances of the precedednce operator from the expression to be checked
-    let mut temp_expression: Vec<(String, crate::Token_type)> = argument_vector.clone();
-    temp_expression.retain(|x| {
-        if x.0 == "(" || x.0 == ")" {
-            false
-        } else {
-            true
-        }
-    });
-    for x in &temp_expression {
-        print!("{} ", x.0);
-    }
-    println!("{}", temp_expression.len());
-    is_valid.0 = match temp_expression[0].1 {
-        //Check if the expression is a valid numeral expression (decimal or number)
-        crate::Token_type::NUMBER_IDENTITY
-        | crate::Token_type::DECIMAL_IDENTITY
-        | crate::Token_type::NUMBER_LITERAL
-        | crate::Token_type::DECIMAL_LITERAL => {
-            let mut return_bool: bool = false;
-            is_valid.1 = crate::Token_type::NUMBER_IDENTITY;
-            if temp_expression.len() != 1 {
-                if temp_expression.last().unwrap().1 == crate::Token_type::NUMBER_IDENTITY
-                    || temp_expression.last().unwrap().1 == crate::Token_type::DECIMAL_IDENTITY
-                    || temp_expression.last().unwrap().1 == crate::Token_type::NUMBER_LITERAL
-                    || temp_expression.last().unwrap().1 == crate::Token_type::DECIMAL_LITERAL
-                {
-                    for i in (1..temp_expression.len()).step_by(2) {
-                        if (temp_expression[i].1 == crate::Token_type::OPERATOR_PLUS
-                            || temp_expression[i].1 == crate::Token_type::OTHER_OPERATOR_ARITHMETIC)
-                            && temp_expression[i - 1].1 == crate::Token_type::NUMBER_IDENTITY
-                            || temp_expression[i - 1].1 == crate::Token_type::DECIMAL_IDENTITY
-                            || temp_expression[i - 1].1 == crate::Token_type::NUMBER_LITERAL
-                            || temp_expression[i - 1].1 == crate::Token_type::DECIMAL_LITERAL
-                        {
-                            return_bool = true;
-                        } else {
-                            return_bool = false;
-                            break;
-                        }
-                    }
-                    if return_bool {
-                        final_string = argument_vector
-                            .iter()
-                            .map(|x| x.0.clone())
-                            .collect::<Vec<String>>()
-                            .join("");
-                    }
-                    return_bool
-                } else {
-                    return_bool
-                }
-            } else {
-                true
-            }
-        }
-        //Check if the expression is a valid string and string literal expression of the form str1+str2..
-        crate::Token_type::STRING_LITERAL | crate::Token_type::STRING_IDENTITY => {
-            let mut return_bool: bool = false;
-            is_valid.1 = crate::Token_type::STRING_LITERAL;
-            if argument_vector.len() != 1 {
-                if argument_vector.last().unwrap().1 == crate::Token_type::STRING_LITERAL
-                    || argument_vector.last().unwrap().1 == crate::Token_type::STRING_IDENTITY
-                {
-                    for i in (1..argument_vector.len()).step_by(2) {
-                        if argument_vector[i].1 == crate::Token_type::OPERATOR_PLUS
-                            && (argument_vector[i - 1].1 == crate::Token_type::STRING_LITERAL
-                                || argument_vector[i - 1].1 == crate::Token_type::STRING_IDENTITY)
-                        {
-                            return_bool = true;
-                        } else {
-                            return_bool = false;
-                            break;
-                        }
-                    }
-                    if return_bool {
-                        final_string = argument_vector
-                            .iter()
-                            .map(|x| x.0.clone())
-                            .collect::<Vec<String>>()
-                            .join("");
-                    }
-                    return_bool
-                } else {
-                    return_bool
-                }
-            } else {
-                true
-            }
-        }
-        _ => false,
-    };
-    if is_valid.0 {
-        if is_valid.1 == crate::Token_type::NUMBER_IDENTITY {
-            let argument = argument_vector
-                .into_iter()
-                .map(|x| x.0.clone())
-                .collect::<Vec<String>>()
-                .join("");
+    for expression_type in &expression_type_vector_and_expressions.0 {
+        let mut final_string: String = String::new();
+        if *expression_type == crate::Expression_type::NUMERIC {
+            let argument = expression_type_vector_and_expressions.1.join("");
             final_string = argument.to_string().clone();
             if new_line {
                 final_string += "<<std::endl";
             }
-        } else if is_valid.1 == crate::Token_type::STRING_LITERAL {
-            let mut temp = String::from(
-                argument_vector
-                    .into_iter()
-                    .map(|x| x.0.clone())
-                    .collect::<Vec<String>>()
-                    .join("")
-                    .replace("_", " "),
-            );
+        } else if *expression_type == crate::Expression_type::STRING {
+            final_string = expression_type_vector_and_expressions.1.join("");
             if new_line {
-                temp += "<<std::endl";
+                final_string += "<<std::endl";
             }
-            final_string = temp;
+        } else {
+            crate::raise(crate::Error::INVALID_EXPRESSION);
         }
         headers.iostream = true;
         (*translated_file)
@@ -159,8 +55,6 @@ pub fn write_to_stdout(
         (*translated_file)
             .write_all(";\n".as_bytes())
             .expect("Write to output.cpp failed!");
-    } else {
-        crate::raise(crate::Error::INVALID_EXPRESSION);
     }
 }
 
@@ -215,9 +109,9 @@ pub fn read_from_stdin(
     }
 }
 
-pub fn variable_assigner(
+pub fn variable_declarer(
     translated_file: &mut fs::File,
-    argument_vector: &Vec<String>,
+    expression_type_vector_and_expressions: &(Vec<crate::Expression_type>, Vec<String>),
     headers: &mut crate::Headers,
     variable_stack: &mut Vec<crate::Variable>,
 ) {
@@ -225,41 +119,35 @@ pub fn variable_assigner(
     //! Checks if the variable name is part of the variable stack, and if it isn't, adds it to it and
     //! declares the variable in C++.
 
-    if argument_vector[1] == "be".to_string()
-        && (argument_vector[2] == "a" || argument_vector[2] == "an")
-    {
-        let variable_name = argument_vector[0].clone();
-        let variable_type = argument_vector[3].clone();
-        let variable_type = match variable_type.as_str() {
-            "number" => crate::Variable_type::NUMBER,
-            "decimal" => crate::Variable_type::DECIMAL,
-            "string" => crate::Variable_type::STRING,
-            _ => {
-                crate::raise(crate::Error::IDENTITY_TYPE_EXPECTED);
-                crate::Variable_type::NUMBER
-            }
-        };
-        let variable: crate::Variable = crate::Variable {
-            variable_type: variable_type,
-            variable_name: variable_name.clone().to_string(),
-        };
-        if variable_stack.iter().any(|i| *i == variable) {
-            crate::raise(crate::Error::IDENTITY_EXISTS);
-        } else {
-            match variable.variable_type {
-                crate::Variable_type::NUMBER => (*translated_file)
+    let mut valid: bool = false;
+    let mut variable_type: crate::Variable_type = crate::Variable_type::NUMBER;
+
+    for expression_type in &expression_type_vector_and_expressions.0 {
+        if *expression_type == crate::Expression_type::DECLARER_NUMBER
+        {
+            (*translated_file)
                     .write_all("int ".as_bytes())
-                    .expect("Write to output.cpp failed!"),
-                crate::Variable_type::DECIMAL => (*translated_file)
+                    .expect("Write to output.cpp failed!");
+                valid = true;
+                variable_type = crate::Variable_type::NUMBER;
+        }
+        else if *expression_type == crate::Expression_type::DECLARER_DECIMAL {
+                (*translated_file)
                     .write_all("float ".as_bytes())
-                    .expect("Write to output.cpp failed!"),
-                crate::Variable_type::STRING => {
+                    .expect("Write to output.cpp failed!");
+                valid = true;
+                variable_type = crate::Variable_type::DECIMAL;
+        }
+        else if *expression_type == crate::Expression_type::DECLARER_STRING {
                     (*translated_file)
                         .write_all("std::string ".as_bytes())
                         .expect("Write to output.cpp failed!");
                     headers.string = true;
+                    valid = true;
+                    variable_type = crate::Variable_type::STRING;
                 }
-            }
+        if valid {
+            let variable = crate::Variable {variable_type: variable_type, variable_name: expression_type_vector_and_expressions.1[0].clone()};
             (*translated_file)
                 .write_all(variable.variable_name.as_bytes())
                 .expect("Write to output.cpp failed!");
@@ -268,7 +156,5 @@ pub fn variable_assigner(
                 .expect("Write to output.cpp failed!");
             variable_stack.push(variable);
         }
-    } else {
-        crate::raise(crate::Error::VERB_EXPECTED);
-    }
+}
 }

@@ -53,12 +53,8 @@ fn main() {
         }
         let query: String = lexical_analysis::string_space_remover_and_bracket_replacer(query);
         let mut query: String = lexical_analysis::bob_and_punctuation_remover(query);
-        let mut query_vector: Vec<String> = query
-            .split_whitespace()
-            .map(String::from)
-            .collect::<Vec<String>>();
         bob::iterator(
-            &mut query_vector,
+            &mut query,
             &mut translated_file,
             &mut headers,
             &mut variable_stack,

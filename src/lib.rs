@@ -28,6 +28,19 @@ pub enum Variable_type {
     DECIMAL,
     STRING,
 }
+
+#[derive(PartialEq, Eq, Clone, Copy)]
+pub enum Expression_type {
+    STRING,
+    NUMERIC,
+    ASSIGNER_STRING,
+    ASSIGNER_DECIMAL,
+    ASSIGNER_NUMBER,
+    DECLARER_STRING,
+    DECLARER_DECIMAL,
+    DECLARER_NUMBER,
+}
+
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub enum Token_type {
     STRING_IDENTITY,
@@ -38,6 +51,11 @@ pub enum Token_type {
     STRING_LITERAL,
     DECIMAL_LITERAL,
     NUMBER_LITERAL,
+    TO_BE_IDENTITY,
+    OPERATOR_ASSIGNMENT,
+    TYPE_STRING,
+    TYPE_NUMBER,
+    TYPE_DECIMAL,
 }
 
 pub struct Variable {
@@ -58,6 +76,7 @@ impl PartialEq for Variable {
 
 impl Eq for Variable {}
 
+/// Error handler for the whole compiler.
 pub fn raise(err: Error) {
     fs::remove_file("output.cpp").expect("Bob didn't see output.cpp");
     match err {
@@ -74,16 +93,18 @@ pub fn raise(err: Error) {
     }
 }
 
+/// Assigns type to each entity in the Bob source so function writers find things easier to do.
+/// Also restores the space in strings. (Earlier converted to underscore.)
 pub fn token_assigner(
-    query_vector: &mut Vec<String>,
+    query_string: &mut String,
     variable_stack: &mut Vec<Variable>,
 ) -> Vec<(String, Token_type)> {
+    let query_vector: Vec<String> = query_string.split(' ').map(str::to_string).collect();
     let mut token_vector: Vec<(String, Token_type)> = Vec::new();
     let mut temp: Variable_type = Variable_type::NUMBER;
-    for query in query_vector {
-        let query = query.to_string();
+    for query in &query_vector {
         if variable_stack.iter().any(|j| {
-            if query == j.variable_name {
+            if *query == j.variable_name {
                 temp = j.variable_type;
                 true
             } else {
@@ -91,11 +112,11 @@ pub fn token_assigner(
             }
         }) {
             if temp == Variable_type::NUMBER {
-                token_vector.push((query, Token_type::NUMBER_IDENTITY));
+                token_vector.push((query.to_string(), Token_type::NUMBER_IDENTITY));
             } else if temp == Variable_type::DECIMAL {
-                token_vector.push((query, Token_type::DECIMAL_IDENTITY));
+                token_vector.push((query.to_string(), Token_type::DECIMAL_IDENTITY));
             } else if temp == Variable_type::STRING {
-                token_vector.push((query, Token_type::STRING_IDENTITY));
+                token_vector.push((query.to_string(), Token_type::STRING_IDENTITY));
             }
         } else if match query.as_str() {
             "-" => true,
@@ -106,83 +127,77 @@ pub fn token_assigner(
             "%" => true,
             _ => false,
         } {
-            token_vector.push((query, Token_type::OTHER_OPERATOR_ARITHMETIC));
+            token_vector.push((query.to_string(), Token_type::OTHER_OPERATOR_ARITHMETIC));
+        } else if query == "string"
+         {
+            token_vector.push((query.to_string(), Token_type::TYPE_STRING));
+        } else if query == "number"
+         {
+            token_vector.push((query.to_string(), Token_type::TYPE_NUMBER));
+        } else if query == "decimal"
+         {
+            token_vector.push((query.to_string(), Token_type::TYPE_DECIMAL));
         } else if query == "+" {
-            token_vector.push((query, Token_type::OPERATOR_PLUS));
-        } else if query.as_bytes()[0] as char == '"'
-            && query.as_bytes()[query.len() - 1] as char == '"'
+            token_vector.push((query.to_string(), Token_type::OPERATOR_PLUS));
+        } else if query == "be" {
+            token_vector.push((query.to_string(), Token_type::OPERATOR_ASSIGNMENT));
+        }
+        else if query.as_bytes()[0] as char == '"'
+            && query.as_bytes()[query.to_string().len() - 1] as char == '"'
         {
-            token_vector.push((query, Token_type::STRING_LITERAL));
+            token_vector.push((query.to_string(), Token_type::STRING_LITERAL));
         } else if !query.parse::<f64>().is_err() {
             if !query.parse::<i32>().is_err() {
-                token_vector.push((query, Token_type::NUMBER_LITERAL));
+                token_vector.push((query.to_string(), Token_type::NUMBER_LITERAL));
             } else {
-                token_vector.push((query, Token_type::DECIMAL_LITERAL));
+                token_vector.push((query.to_string(), Token_type::DECIMAL_LITERAL));
             }
         } else {
-            raise(Error::TOKEN_EXPECTED);
+            token_vector.push((query.to_string(), Token_type::TO_BE_IDENTITY));
         }
     }
+    *query_string = query_vector.join(" ");
     token_vector
 }
 
 /// operators declared here and in token assigner. Iterates through the query(sentence) vector, assigns token types to each element and calls the respective functions.
 pub fn iterator(
-    query_vector: &mut Vec<String>,
+    query: &mut String,
     translated_file: &mut fs::File,
     headers: &mut Headers,
     variable_stack: &mut Vec<Variable>,
 ) {
-    *query_vector = query_vector
-        .join(" ")
-        .replace("plus", "+")
+    *query = query.replace("plus", "+");
+    *query = query.replace("minus", "-");
+    *query = query.replace("times", "*");
+    *query = query.replace("over", "/");
+    *query = query.replace("plus", "+");
+    *query = query.replace("modulo", "%");
+    let mut query_vector: Vec<String> = query
         .split_whitespace()
         .map(String::from)
         .collect::<Vec<String>>();
-    *query_vector = query_vector
-        .join(" ")
-        .replace("minus", "-")
-        .split_whitespace()
-        .map(String::from)
-        .collect::<Vec<String>>();
-    *query_vector = query_vector
-        .join(" ")
-        .replace("times", "*")
-        .split_whitespace()
-        .map(String::from)
-        .collect::<Vec<String>>();
-    *query_vector = query_vector
-        .join(" ")
-        .replace("over", "/")
-        .split_whitespace()
-        .map(String::from)
-        .collect::<Vec<String>>();
-    *query_vector = query_vector
-        .join(" ")
-        .replace("plus", "+")
-        .split_whitespace()
-        .map(String::from)
-        .collect::<Vec<String>>();
-    *query_vector = query_vector
-        .join(" ")
-        .replace("modulo", "%")
-        .split_whitespace()
-        .map(String::from)
-        .collect::<Vec<String>>();
+
     match query_vector[0].as_str() {
         "write" => {
             if query_vector[1].as_str() == "line" {
                 standard_function_declarations::write_to_stdout(
                     true,
                     translated_file,
-                    &token_assigner(&mut query_vector[2..].to_vec(), variable_stack),
+                    &lexical_analysis::expression_parser(
+                        &mut query_vector[2..].to_vec(),
+                        variable_stack,
+                    ),
                     headers,
                 );
             } else {
                 standard_function_declarations::write_to_stdout(
                     false,
                     translated_file,
-                    &token_assigner(&mut query_vector[1..].to_vec(), variable_stack),
+                    &lexical_analysis::expression_parser(
+                        &mut query_vector[1..].to_vec(),
+                        variable_stack,
+                    ),
                     headers,
                 );
             }
@@ -193,9 +208,9 @@ pub fn iterator(
             headers,
             variable_stack,
         ),
-        "let" => standard_function_declarations::variable_assigner(
+        "let" => standard_function_declarations::variable_declarer(
             translated_file,
-            &query_vector[1..].to_vec(),
+            &lexical_analysis::expression_parser(&mut query_vector[1..].to_vec(), variable_stack),
             headers,
             variable_stack,
         ),
