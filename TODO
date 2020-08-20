@@ -1,3 +1,4 @@
 1. Sentences should be read upto period. Not line by line.
-2. UNICODE
+2. UNICODE support.
 3. "and" operator for coupling function calls. 
+4. Object orientedness in the form of boxes. Containing Data and command clusters (user defined verbs).
