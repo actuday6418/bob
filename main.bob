@@ -1,7 +1,6 @@
-(Program to display area of a circle)
-Bob write "Enter the Radius of the circle in metres: ".
-Bob let Radius be number. 
-Bob read Radius.
-Bob write "Area: ".
-Bob write { Radius * Radius } * 3.14.
-Bob write line " metres".
+(Program to display area of() a circle)
+Bob write "Enter the Radius of the circle in metres: " . Bob let Radius be decimal .
+Bob read Radius .
+Bob write "Area: " .
+Bob write { Radius * Radius } * 3.14 .
+Bob write line " square metres" .

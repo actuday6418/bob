@@ -123,31 +123,35 @@ pub fn variable_declarer(
     let mut variable_type: crate::Variable_type = crate::Variable_type::NUMBER;
     let mut expression_index: usize = 0;
     for expression_type in &expression_type_vector_and_expressions.0 {
-        if *expression_type == crate::Expression_type::DECLARER_NUMBER
-        {
+        if *expression_type == crate::Expression_type::DECLARER_NUMBER {
             (*translated_file)
-                    .write_all("int ".as_bytes())
-                    .expect("Write to output.cpp failed!");
-                valid = true;
-                variable_type = crate::Variable_type::NUMBER;
+                .write_all("int ".as_bytes())
+                .expect("Write to output.cpp failed!");
+            valid = true;
+            variable_type = crate::Variable_type::NUMBER;
+        } else if *expression_type == crate::Expression_type::DECLARER_DECIMAL {
+            (*translated_file)
+                .write_all("float ".as_bytes())
+                .expect("Write to output.cpp failed!");
+            valid = true;
+            variable_type = crate::Variable_type::DECIMAL;
+        } else if *expression_type == crate::Expression_type::DECLARER_STRING {
+            (*translated_file)
+                .write_all("std::string ".as_bytes())
+                .expect("Write to output.cpp failed!");
+            headers.string = true;
+            valid = true;
+            variable_type = crate::Variable_type::STRING;
         }
-        else if *expression_type == crate::Expression_type::DECLARER_DECIMAL {
-                (*translated_file)
-                    .write_all("float ".as_bytes())
-                    .expect("Write to output.cpp failed!");
-                valid = true;
-                variable_type = crate::Variable_type::DECIMAL;
-        }
-        else if *expression_type == crate::Expression_type::DECLARER_STRING {
-                    (*translated_file)
-                        .write_all("std::string ".as_bytes())
-                        .expect("Write to output.cpp failed!");
-                    headers.string = true;
-                    valid = true;
-                    variable_type = crate::Variable_type::STRING;
-                }
         if valid {
-            let variable = crate::Variable {variable_type: variable_type, variable_name: expression_type_vector_and_expressions.1[expression_index].split_whitespace().map(String::from).collect::<Vec<String>>()[0].clone()};
+            let variable = crate::Variable {
+                variable_type: variable_type,
+                variable_name: expression_type_vector_and_expressions.1[expression_index]
+                    .split_whitespace()
+                    .map(String::from)
+                    .collect::<Vec<String>>()[0]
+                    .clone(),
+            };
             (*translated_file)
                 .write_all(variable.variable_name.as_bytes())
                 .expect("Write to output.cpp failed!");
@@ -155,10 +159,9 @@ pub fn variable_declarer(
                 .write_all(";\n".as_bytes())
                 .expect("Write to output.cpp failed!");
             variable_stack.push(variable);
-        }
-        else {
+        } else {
             crate::raise(crate::Error::INVALID_EXPRESSION);
         }
         expression_index += 1;
-}
+    }
 }

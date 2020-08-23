@@ -14,6 +14,7 @@ pub enum Error {
     IDENTITY_EXPECTED,
     TOKEN_EXPECTED,
     INVALID_EXPRESSION,
+    MALFORMED_COMMENT,
 }
 
 pub struct Headers {
@@ -90,6 +91,7 @@ pub fn raise(err: Error) {
         Error::IDENTITY_EXPECTED => panic!("Name an identity!"),
         Error::TOKEN_EXPECTED => panic!("Token expected!"),
         Error::INVALID_EXPRESSION => panic!("Expression isn't valid"),
+        Error::MALFORMED_COMMENT => panic!("Check you parantheses!"),
     }
 }
 
@@ -128,21 +130,17 @@ pub fn token_assigner(
             _ => false,
         } {
             token_vector.push((query.to_string(), Token_type::OTHER_OPERATOR_ARITHMETIC));
-        } else if query == "string"
-         {
+        } else if query == "string" {
             token_vector.push((query.to_string(), Token_type::TYPE_STRING));
-        } else if query == "number"
-         {
+        } else if query == "number" {
             token_vector.push((query.to_string(), Token_type::TYPE_NUMBER));
-        } else if query == "decimal"
-         {
+        } else if query == "decimal" {
             token_vector.push((query.to_string(), Token_type::TYPE_DECIMAL));
         } else if query == "+" {
             token_vector.push((query.to_string(), Token_type::OPERATOR_PLUS));
         } else if query == "be" {
             token_vector.push((query.to_string(), Token_type::OPERATOR_ASSIGNMENT));
-        }
-        else if query.as_bytes()[0] as char == '"'
+        } else if query.as_bytes()[0] as char == '"'
             && query.as_bytes()[query.to_string().len() - 1] as char == '"'
         {
             token_vector.push((query.to_string(), Token_type::STRING_LITERAL));

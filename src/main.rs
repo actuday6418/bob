@@ -40,26 +40,48 @@ fn main() {
         .append(true)
         .open("output.cpp")
         .expect("File creation failed!");
-    let reader = fs::File::open(&arg[1]).expect("Couldn't open that file!");
-    let reader = io::BufReader::new(reader);
+    let reader = io::BufReader::new(fs::File::open(&arg[1]).expect("Couldn't open that file!"));
+    let mut buffer: Vec<char> = vec![];
+    let mut last_char: char = 'a';
     let mut variable_stack: Vec<bob::Variable> = Vec::new();
-    for query in reader.lines() {
-        // !! Is this the most efficient way to iterate through each line in the source? Also, read sentences instead of lines !!
-        let query = query.unwrap();
-        let query = &(query.trim());
-        let query: String = lexical_analysis::comment_remover(query);
-        if query.len() == 0 {
-            continue;
+    let mut ignore_char: i32 = 0;
+    for line in reader.lines() {
+        for c in line.expect("Source read failed!").chars() {
+            if ignore_char != 0 {
+                if c == '(' {
+                    ignore_char += 1;
+                } else if c == ')' {
+                    ignore_char -= 1;
+                }
+                last_char = c;
+                continue;
+            } else if c == '.' && last_char == ' ' {
+                buffer.push(c);
+                let query = buffer.iter().cloned().collect::<String>();
+                let query: String = query.trim().to_string();
+                if query.len() == 0 {
+                    continue;
+                }
+                let query: String =
+                    lexical_analysis::string_space_remover_and_bracket_replacer(query);
+                let mut query: String = lexical_analysis::bob_and_punctuation_remover(query);
+                bob::iterator(
+                    &mut query,
+                    &mut translated_file,
+                    &mut headers,
+                    &mut variable_stack,
+                );
+                query.clear();
+                buffer.clear();
+            } else if c == '(' {
+                ignore_char += 1;
+            } else if c == ')' {
+                bob::raise(bob::Error::MALFORMED_COMMENT);
+            } else {
+                buffer.push(c);
+            }
+            last_char = c;
         }
-        let query: String = lexical_analysis::string_space_remover_and_bracket_replacer(query);
-        let mut query: String = lexical_analysis::bob_and_punctuation_remover(query);
-        bob::iterator(
-            &mut query,
-            &mut translated_file,
-            &mut headers,
-            &mut variable_stack,
-        );
-        query.clear();
     }
     bob::header_and_token_includer(headers);
     process::Command::new("g++")

@@ -70,12 +70,14 @@ pub fn comment_remover(query: &str) -> String {
 pub fn bob_and_punctuation_remover(query: String) -> String {
     let mut temp: String = "".to_string();
     let mut number_spaces: usize = 0;
+    //Are leading spaces deleted by trim?
     while query.as_bytes()[number_spaces] as char == ' ' {
         number_spaces += 1;
     }
     if &query[number_spaces..number_spaces + 4] == "Bob " {
         temp = query[number_spaces + 4..].to_string();
     } else {
+        println!("l{}l", &query[number_spaces..number_spaces + 4]);
         crate::raise(crate::Error::BOB_NOT_FOUND);
     }
     if &query[query.len() - 1..] == "." {
@@ -112,31 +114,26 @@ pub fn expression_parser(
             //Check if the expression is a valid declaring expression of the form '"NAME" be type'.
             crate::Token_type::TO_BE_IDENTITY => {
                 if temp_expression.len() == 3 {
-                if temp_expression[1].1 == crate::Token_type::OPERATOR_ASSIGNMENT {
-                    if temp_expression[2].1 == crate::Token_type::TYPE_STRING {
-                        expression_type = crate::Expression_type::DECLARER_STRING;
-                        true
+                    if temp_expression[1].1 == crate::Token_type::OPERATOR_ASSIGNMENT {
+                        if temp_expression[2].1 == crate::Token_type::TYPE_STRING {
+                            expression_type = crate::Expression_type::DECLARER_STRING;
+                            true
+                        } else if temp_expression[2].1 == crate::Token_type::TYPE_DECIMAL {
+                            expression_type = crate::Expression_type::DECLARER_DECIMAL;
+                            true
+                        } else if temp_expression[2].1 == crate::Token_type::TYPE_NUMBER {
+                            expression_type = crate::Expression_type::DECLARER_NUMBER;
+                            true
+                        } else {
+                            false
+                        }
+                    } else {
+                        false
                     }
-                    else if temp_expression[2].1 == crate::Token_type::TYPE_DECIMAL {
-                        expression_type = crate::Expression_type::DECLARER_DECIMAL;
-                        true
-                    }
-else if temp_expression[2].1 == crate::Token_type::TYPE_NUMBER {
-                        expression_type = crate::Expression_type::DECLARER_NUMBER;
-                        true
-}
-else {
-    false
-}
-                }
-                else {
+                } else {
                     false
                 }
-                }
-                else {
-                    false
-                }
-            },
+            }
             //Check if the expression is a valid numeral expression (decimal or number)
             crate::Token_type::NUMBER_IDENTITY
             | crate::Token_type::DECIMAL_IDENTITY
@@ -179,7 +176,7 @@ else {
                 expression_type = crate::Expression_type::STRING;
                 for x in temp_expression.iter_mut() {
                     if x.1 == crate::Token_type::STRING_LITERAL {
-                        x.0 = x.0.replace("_"," ");
+                        x.0 = x.0.replace("_", " ");
                     }
                 }
                 if temp_expression.len() != 1 {
@@ -211,9 +208,13 @@ else {
         if is_valid {
             expression_type_vector.push(expression_type);
         } else {
-             crate::raise(crate::Error::INVALID_EXPRESSION);
+            crate::raise(crate::Error::INVALID_EXPRESSION);
         }
-        *expression = temp_expression.iter().map(|x| x.0.clone()).collect::<Vec<String>>().join(" ");
+        *expression = temp_expression
+            .iter()
+            .map(|x| x.0.clone())
+            .collect::<Vec<String>>()
+            .join(" ");
     }
     (expression_type_vector, expressions)
 }
