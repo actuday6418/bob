@@ -23,22 +23,15 @@ use std::io::Write;
 pub fn write_to_stdout(
     new_line: bool,
     translated_file: &mut fs::File,
-    expression_type_vector_and_expressions: &(Vec<crate::Expression_type>, Vec<String>),
+    expression_type_and_expression: (crate::Expression_type, String),
     headers: &mut crate::Headers,
 ) {
     //!-----------WHASSDIS-------------
     //! Accepts a string or expression that is evaluated and written to stdout. Defines both the
     //! write and write_line Bob functions.
-    for expression_type in &expression_type_vector_and_expressions.0 {
         let mut final_string: String = String::new();
-        if *expression_type == crate::Expression_type::NUMERIC {
-            let argument = expression_type_vector_and_expressions.1.join("");
-            final_string = argument.to_string().clone();
-            if new_line {
-                final_string += "<<std::endl";
-            }
-        } else if *expression_type == crate::Expression_type::STRING {
-            final_string = expression_type_vector_and_expressions.1.join("");
+        if expression_type_and_expression.0 == crate::Expression_type::NUMERIC || expression_type_and_expression.0 == crate::Expression_type::STRING{
+            final_string = expression_type_and_expression.1.clone();
             if new_line {
                 final_string += "<<std::endl";
             }
@@ -55,7 +48,7 @@ pub fn write_to_stdout(
         (*translated_file)
             .write_all(";\n".as_bytes())
             .expect("Write to output.cpp failed!");
-    }
+    
 }
 
 pub fn read_from_stdin(
@@ -111,7 +104,7 @@ pub fn read_from_stdin(
 
 pub fn variable_declarer(
     translated_file: &mut fs::File,
-    expression_type_vector_and_expressions: &(Vec<crate::Expression_type>, Vec<String>),
+    expression_type_and_expression: (crate::Expression_type, String),
     headers: &mut crate::Headers,
     variable_stack: &mut Vec<crate::Variable>,
 ) {
@@ -122,20 +115,19 @@ pub fn variable_declarer(
     let mut valid: bool = false;
     let mut variable_type: crate::Variable_type = crate::Variable_type::NUMBER;
     let mut expression_index: usize = 0;
-    for expression_type in &expression_type_vector_and_expressions.0 {
-        if *expression_type == crate::Expression_type::DECLARER_NUMBER {
+        if expression_type_and_expression.0 == crate::Expression_type::DECLARER_NUMBER {
             (*translated_file)
                 .write_all("int ".as_bytes())
                 .expect("Write to output.cpp failed!");
             valid = true;
             variable_type = crate::Variable_type::NUMBER;
-        } else if *expression_type == crate::Expression_type::DECLARER_DECIMAL {
+        } else if expression_type_and_expression.0 == crate::Expression_type::DECLARER_DECIMAL {
             (*translated_file)
                 .write_all("float ".as_bytes())
                 .expect("Write to output.cpp failed!");
             valid = true;
             variable_type = crate::Variable_type::DECIMAL;
-        } else if *expression_type == crate::Expression_type::DECLARER_STRING {
+        } else if expression_type_and_expression.0 == crate::Expression_type::DECLARER_STRING {
             (*translated_file)
                 .write_all("std::string ".as_bytes())
                 .expect("Write to output.cpp failed!");
@@ -146,7 +138,7 @@ pub fn variable_declarer(
         if valid {
             let variable = crate::Variable {
                 variable_type: variable_type,
-                variable_name: expression_type_vector_and_expressions.1[expression_index]
+                variable_name: expression_type_and_expression.1
                     .split_whitespace()
                     .map(String::from)
                     .collect::<Vec<String>>()[0]
@@ -162,6 +154,4 @@ pub fn variable_declarer(
         } else {
             crate::raise(crate::Error::INVALID_EXPRESSION);
         }
-        expression_index += 1;
-    }
 }

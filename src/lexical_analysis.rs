@@ -6,23 +6,26 @@ pub fn string_space_remover_and_bracket_replacer(query: String) -> String {
     let mut flag: bool;
     let mut string_vec: Vec<(usize, usize)> = Vec::new();
     while i < query.len() {
+        flag = false;
         if query.as_bytes()[i] as char == '"' {
-            j = i;
             flag = true;
+            j = i + 1;
             while j < query.len() {
                 if query.as_bytes()[j] as char == '"' {
                     flag = false;
                     string_vec.push((i, j));
                     i = j;
                 }
-                j = j + 1;
+                j += 1;
+                if !flag {
+                    break;
+            }
             }
             if flag {
-                string_vec.push((i, query.len()));
-                i = query.len();
+                //error unclosed string
             }
         }
-        i = i + 1;
+        i += 1;
     }
     let mut query = query.to_string();
     for x in string_vec {
@@ -33,37 +36,6 @@ pub fn string_space_remover_and_bracket_replacer(query: String) -> String {
     }
     query = query.replace("}", ")");
     query = query.replace("{", "(");
-    query
-}
-
-pub fn comment_remover(query: &str) -> String {
-    let mut i: usize = 0;
-    let mut j: usize;
-    let mut flag: bool;
-    let mut comment_vec: Vec<(usize, usize)> = Vec::new();
-    while i < query.len() {
-        if query.as_bytes()[i] as char == '(' {
-            j = i;
-            flag = true;
-            while j < query.len() {
-                if query.as_bytes()[j] as char == ')' {
-                    flag = false;
-                    comment_vec.push((i, j));
-                    i = j;
-                }
-                j = j + 1;
-            }
-            if flag {
-                comment_vec.push((i, query.len()));
-                i = query.len();
-            }
-        }
-        i = i + 1;
-    }
-    let mut query = String::from(query);
-    for x in comment_vec {
-        query.replace_range(x.0..x.1 + 1, "");
-    }
     query
 }
 
@@ -101,6 +73,8 @@ pub fn expression_parser(
     let mut expression_type_vector: Vec<crate::Expression_type> = Vec::new();
     let mut expression_type: crate::Expression_type = crate::Expression_type::STRING;
     for mut expression in &mut expressions {
+        if expression.len() == 0 {continue;}
+        println!("{}",expression);
         let temp_expression: &mut Vec<(String, crate::Token_type)> =
             &mut crate::token_assigner(&mut expression, variable_stack);
         temp_expression.retain(|x| {

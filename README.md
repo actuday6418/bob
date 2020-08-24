@@ -2,7 +2,7 @@
 Bob's a new language (Generates C++ code and then compiles it with g++). Say hello to Bob.
 
 # Hello World
-		Bob write "Hello world!!".
+		Bob write "Hello world!!" .
 
 # Issues
 The currently open issues are things I haven't put time in to see how to implement in Rust. They're still valuable things a new comer to the code base and Rust could easily do.
@@ -64,4 +64,4 @@ Check out the files in the examples directory.
 Things to be implemented are mentioned here. (This is a short term roadmap)
 
 # Vim plugin
-A vim plugin is available for Bob that currently supports text highlighting, and will be able to do autocompletion in the near future as well. Repo is at https://github.com/actuday6418/bob-vim
+A vim plugin is available for Bob that currently supports text highlighting and not perfectly refined autocomplete. Repo is at https://github.com/actuday6418/bob-vim

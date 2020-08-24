@@ -175,27 +175,26 @@ pub fn iterator(
         .split_whitespace()
         .map(String::from)
         .collect::<Vec<String>>();
-
+let expression_ret = &lexical_analysis::expression_parser(
+                        &mut query_vector[2..].to_vec(),
+                        variable_stack,
+                    );
+let mut i: usize = 0;
+while i < expression_ret.0.len() {
     match query_vector[0].as_str() {
         "write" => {
             if query_vector[1].as_str() == "line" {
                 standard_function_declarations::write_to_stdout(
                     true,
                     translated_file,
-                    &lexical_analysis::expression_parser(
-                        &mut query_vector[2..].to_vec(),
-                        variable_stack,
-                    ),
+                    (expression_ret.0[i],expression_ret.1[i].clone()),
                     headers,
                 );
             } else {
                 standard_function_declarations::write_to_stdout(
                     false,
                     translated_file,
-                    &lexical_analysis::expression_parser(
-                        &mut query_vector[1..].to_vec(),
-                        variable_stack,
-                    ),
+                    (expression_ret.0[i],expression_ret.1[i].clone()),
                     headers,
                 );
             }
@@ -208,12 +207,13 @@ pub fn iterator(
         ),
         "let" => standard_function_declarations::variable_declarer(
             translated_file,
-            &lexical_analysis::expression_parser(&mut query_vector[1..].to_vec(), variable_stack),
+            (expression_ret.0[i],expression_ret.1[i].clone()),
             headers,
             variable_stack,
         ),
         _ => raise(Error::VERB_EXPECTED),
     }
+}
 }
 
 fn text_prepender_and_curly_appender(data: String) {

@@ -1,11 +1,11 @@
 (This is a program that reads two decimals and prints their sum) 
-Bob write line "Begining program..".
-Bob let Martha be a decimal.
-Bob let Peter be a decimal.
-Bob write line "Enter the value of Martha".
-Bob read Martha.
-Bob write line "Enter the value of Peter".
-Bob read Peter.
-Bob write "The sum of Martha and Peter is: ".
-Bob write line Peter + Martha.
+Bob write line "Begining program.." .
+Bob let Martha be a decimal .
+Bob let Peter be a decimal .
+Bob write line "Enter the value of Martha" .
+Bob read Martha .
+Bob write line "Enter the value of Peter" .
+Bob read Peter .
+Bob write "The sum of Martha and Peter is: " .
+Bob write line Peter + Martha .
 (Every token in Bob has to be seperated by a space, including ops)

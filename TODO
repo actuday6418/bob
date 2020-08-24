@@ -1,4 +1,5 @@
-1. Sentences should be read upto period. Not line by line.
+x. Fix and implementation (function calls in lib.rs)
+1. extend standard library.
 2. UNICODE support.
 3. "and" operator for coupling function calls. 
 4. Object orientedness in the form of boxes. Containing Data and command clusters (user defined verbs).
