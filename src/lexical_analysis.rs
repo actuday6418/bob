@@ -6,7 +6,6 @@ pub fn string_space_remover_and_bracket_replacer(query: String) -> String {
     let mut flag: bool;
     let mut string_vec: Vec<(usize, usize)> = Vec::new();
     while i < query.len() {
-        flag = false;
         if query.as_bytes()[i] as char == '"' {
             flag = true;
             j = i + 1;
@@ -74,7 +73,6 @@ pub fn expression_parser(
     let mut expression_type: crate::Expression_type = crate::Expression_type::STRING;
     for mut expression in &mut expressions {
         if expression.len() == 0 {continue;}
-        println!("{}",expression);
         let temp_expression: &mut Vec<(String, crate::Token_type)> =
             &mut crate::token_assigner(&mut expression, variable_stack);
         temp_expression.retain(|x| {

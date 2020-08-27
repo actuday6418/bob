@@ -114,7 +114,6 @@ pub fn variable_declarer(
 
     let mut valid: bool = false;
     let mut variable_type: crate::Variable_type = crate::Variable_type::NUMBER;
-    let mut expression_index: usize = 0;
         if expression_type_and_expression.0 == crate::Expression_type::DECLARER_NUMBER {
             (*translated_file)
                 .write_all("int ".as_bytes())

@@ -175,46 +175,64 @@ pub fn iterator(
         .split_whitespace()
         .map(String::from)
         .collect::<Vec<String>>();
-let expression_ret = &lexical_analysis::expression_parser(
-                        &mut query_vector[2..].to_vec(),
+    //Put the second word of all two worded standard functions here
+    let expression_and_type = if query_vector[1] == "line" {(lexical_analysis::expression_parser(
+            &mut query_vector[2..].to_vec(),
+            variable_stack,
+            )).to_owned()
+    }
+    else {
+ (lexical_analysis::expression_parser(
+                        &mut query_vector[1..].to_vec(),
                         variable_stack,
-                    );
+                    )).to_owned()
+
+    };
+    let expression_and_type = &expression_and_type;
 let mut i: usize = 0;
-while i < expression_ret.0.len() {
     match query_vector[0].as_str() {
         "write" => {
             if query_vector[1].as_str() == "line" {
+                while i<expression_and_type.0.len(){
                 standard_function_declarations::write_to_stdout(
                     true,
                     translated_file,
-                    (expression_ret.0[i],expression_ret.1[i].clone()),
+                    (expression_and_type.0[i],expression_and_type.1[i].clone())
+,
                     headers,
                 );
+                i += 1;}
             } else {
+                while i < expression_and_type.0.len() {
                 standard_function_declarations::write_to_stdout(
                     false,
                     translated_file,
-                    (expression_ret.0[i],expression_ret.1[i].clone()),
+                        (expression_and_type.0[i],expression_and_type.1[i].clone()),
+
                     headers,
                 );
+                i += 1;
+                }
             }
-        }
+        },
         "read" => standard_function_declarations::read_from_stdin(
             translated_file,
             &query_vector[1],
             headers,
             variable_stack,
         ),
-        "let" => standard_function_declarations::variable_declarer(
+        "let" => while i<expression_and_type.0.len() {
+            standard_function_declarations::variable_declarer(
             translated_file,
-            (expression_ret.0[i],expression_ret.1[i].clone()),
+            (expression_and_type.0[i],expression_and_type.1[i].clone())
+,
             headers,
             variable_stack,
-        ),
+        );
+            i += 1;
+        },
         _ => raise(Error::VERB_EXPECTED),
-    }
-}
-}
+    }}
 
 fn text_prepender_and_curly_appender(data: String) {
     let mut temp_file = fs::OpenOptions::new()
