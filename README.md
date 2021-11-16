@@ -1,5 +1,5 @@
 # Bob
-Bob's a new language (Generates C++ code and then compiles it with g++). The idea is to have an English like syntax that doesn't compromise much of the flexibility of the language's use, while being fast and compiled.
+Bob's a young esoteric language (Generates C++ code and then compiles it with g++). The idea is to have an English like syntax that doesn't compromise much of the flexibility of the language's use, while being fast and compiled. Fun and impractical.
 
 # Hello World
 		Bob write "Hello world!!" .
